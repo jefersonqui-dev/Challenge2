@@ -1,7 +1,7 @@
 package com.jquiguantar.ues.model.resources;
 
 // para que los tipos de recursos esten predefinidos y evitar errores tipograficos como bombero vs Bombero
-enum TipoRecurso {
+public enum TipoRecurso {
     BOMBEROS_UNIT,
     AMBULANCIAS_VEHICULO,
     POLICIA_UNIT,
