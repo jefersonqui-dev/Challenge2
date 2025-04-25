@@ -2,6 +2,9 @@ package com.jquiguantar.ues.services;
 
 import com.jquiguantar.ues.model.emergencies.Emergencia;
 
+//Esta Interfaz define el "Contrato": Especifica que métodos deben tener las clsaes 
+//que quieran ser consideradas capaces de 
+//gestionar emergencias
 public interface GestionEmergencia {
     // Método para asignar recursos a una emergencia específica
     // Recibe la emergencia a la que se asignarán los recursos
