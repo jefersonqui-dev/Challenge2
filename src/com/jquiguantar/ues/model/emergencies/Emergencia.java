@@ -6,10 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public enum NivelGravedad {
-    BAJO, MEDIO, ALTO
-}
-
 enum EstadoEmergencia {
     PENDIENTE, EN_PROGRESO, RESUELTA, CERRADA, CANCELADA
 
