@@ -19,12 +19,7 @@ enum TipoRecurso {
  * tiene un estado de disponibilidad que indica si esta disponible
  * para atender una emergencia.
  * 
- * Creamos la clase recursos definimos sus caracteristicas como atributos
- * private(para encapsular los datos),
- * creamos un constructor para inicializar esos atributos al crear objetos, y
- * creamos los getters y setters para permitir el acceso controlado
- * a esos datos desde fuera de la clase. esto establece la base para todos
- * los tipos especificos de recursos que crearemos despues usando HERENCIA
+ * 
  */
 public class Recursos {
 
