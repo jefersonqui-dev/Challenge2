@@ -37,4 +37,8 @@ public class BomberoService implements GestionEmergencia {
         return true; // O false dependiendo del resultado de tu lógica
     }
 
+    public String getNombreServicio() {
+        return this.nombreServicio;
+    }
+
 }
