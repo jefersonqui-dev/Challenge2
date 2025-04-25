@@ -34,4 +34,8 @@ public class AmbulanciaService implements GestionEmergencia {
         System.out.println("AmbulanciaService resolviendo emergencia..."); // Simulación de resolución
         return true; // O false dependiendo del resultado de tu lógica
     }
+
+    public String getNombreServicio() {
+        return this.nombreServicio;
+    }
 }
