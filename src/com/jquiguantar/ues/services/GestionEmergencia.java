@@ -2,16 +2,27 @@ package com.jquiguantar.ues.services;
 
 import com.jquiguantar.ues.model.emergencies.Emergencia;
 
+//Esta Interfaz define el "Contrato": Especifica que métodos deben tener las clsaes 
+//que quieran ser consideradas capaces de 
+//gestionar emergencias
 public interface GestionEmergencia {
-    // Método para asignar recursos a una emergencia específica
-    // Recibe la emergencia a la que se asignarán los recursos
-    // Podría devolver true/false indicando si fue posible asignar
+
+    /**
+     * asignar recursos de este servicio a la emergencia dada.
+     * 
+     * @param emergencia La emergencia a registrar
+     * @return true si el registro fue exitoso, false en caso contrario
+     */
     boolean registrarEmergencia(Emergencia emergencia);
 
-    // Método para simular la resolución o progreso de una emergencia
-    // Podría recibir la emergencia y quizás un indicador de progreso o estado
-    // Podría devolver true/false si la emergencia se considera resuelta
+    /**
+     * Simula el progreso o la resolucion de la emergencia por parte de este
+     * servicio.
+     * 
+     * @param emergencia La emergencia a resolver
+     * @return true si la emergencia se considera resuelta, false en caso contrario
+     */
     boolean resolverEmergencia(Emergencia emergencia);
 
-    // String getNombreServicio();
+
 }

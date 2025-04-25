@@ -32,4 +32,8 @@ public class PoliciaService implements GestionEmergencia {
     public boolean resolverEmergencia(Emergencia emergencia) {
         return false;
     }
+
+    public String getNombreServicio() {
+        return this.nombreServicio;
+    }
 }
