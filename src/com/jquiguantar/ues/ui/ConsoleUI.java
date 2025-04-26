@@ -38,4 +38,10 @@ public class ConsoleUI {
         }
         return opcion;
     }
+
+    public void cerrarScanner() {
+        if (scanner != null) {
+            scanner.close();
+        }
+    }
 }
