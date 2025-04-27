@@ -32,8 +32,7 @@ public class EmergenciaFactory {
     public static Emergencia crearEmergencia(TipoEmergencia tipo, String ubicacion, NivelGravedad gravedad) {
         // La logica de creacion se centraliza aqui
         // Por ahora es solo llamar al constructor privado de Emergencia
-        // En el futuro se puede agregar logica adicional para crear diferentes tipos de
-        // Emergencia
+
         return new Emergencia(tipo, ubicacion, gravedad);
     }
 
