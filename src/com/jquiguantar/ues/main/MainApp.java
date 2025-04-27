@@ -9,6 +9,8 @@ import com.jquiguantar.ues.model.emergencies.Emergencia;
 import com.jquiguantar.ues.model.emergencies.TipoEmergencia;
 import com.jquiguantar.ues.model.emergencies.NivelGravedad;
 
+import com.jquiguantar.ues.patterns.factory.EmergenciaFactory;
+
 public class MainApp {
     public static void main(String[] args) {
         System.out.println("Iniciando Sistema De Emergencias Urbanas...");
@@ -29,11 +31,11 @@ public class MainApp {
                     String ubicacion = ui.solicitarUbicacion();
                     NivelGravedad gravedad = ui.solicitarNivelGravedad();
 
-                    // 2. Crear la instancia de emergencia
-                    // Luego refactorizaremos para implementar el patron Factory
-                    Emergencia emergencia = new Emergencia(tipo, ubicacion, gravedad);
+                    // 2. Usamos el patron Factory para crear la INSTANCIA de Emergencia
+                    Emergencia nuevaEmergencia = EmergenciaFactory.crearEmergencia(tipo, ubicacion, gravedad);
+
                     // 3. Registrar la emergencia en el sistema
-                    sistema.registrarEmergencia(emergencia);
+                    sistema.registrarEmergencia(nuevaEmergencia);
                     System.out.println("Emergencia Registrada con exito...");
                     break;
                 case 2: // Ver el Estado Actual de Recursos

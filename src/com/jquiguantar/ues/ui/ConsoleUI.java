@@ -7,9 +7,9 @@ import com.jquiguantar.ues.model.emergencies.AccidenteVehicular;
 import com.jquiguantar.ues.model.emergencies.Incendio;
 import com.jquiguantar.ues.model.emergencies.Robo;
 import com.jquiguantar.ues.model.resources.Recursos;
-import com.jquiguantar.ues.model.resources.TipoRecurso;
+//import com.jquiguantar.ues.model.resources.TipoRecurso;
 
-import java.util.InputMismatchException;
+//import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
