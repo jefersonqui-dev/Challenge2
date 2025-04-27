@@ -6,6 +6,8 @@ import com.jquiguantar.ues.model.emergencies.TipoEmergencia;
 import com.jquiguantar.ues.model.emergencies.AccidenteVehicular;
 import com.jquiguantar.ues.model.emergencies.Incendio;
 import com.jquiguantar.ues.model.emergencies.Robo;
+import com.jquiguantar.ues.model.resources.Recursos;
+import com.jquiguantar.ues.model.resources.TipoRecurso;
 
 import java.util.InputMismatchException;
 import java.util.List;
@@ -144,6 +146,32 @@ public class ConsoleUI {
 
         }
         return gravedadSeleccionada;
+    }
+
+    public void mostrarEstadoRecursos(List<Recursos> disponibles, List<Recursos> ocupados) {
+        System.out.println("\n--- ESTADO ACTUAL DE RECURSOS ---");
+
+        System.out.println("\n--- Recursos Disponibles (" + disponibles.size() + ") ---");
+        if (disponibles.isEmpty()) {
+            System.out.println("No hay recursos disponibles en este momento.");
+        } else {
+            for (Recursos recurso : disponibles) {
+                // Mustra la informacion basica de cada Recurso
+                System.out.println("ID: " + recurso.getId() + ", Tipo: " + recurso.getTipo() + ", Ubicacion: "
+                        + recurso.getUbicacionActual());
+            }
+        }
+        System.out.println("\n--- Recursos Ocupados (" + ocupados.size() + ") ---");
+        if (ocupados.isEmpty()) {
+            System.out.println("No hay recursos ocupados en este momento.");
+        } else {
+            for (Recursos recurso : ocupados) {
+                // Mustra la informacion basica de cada Recurso
+                System.out.println("ID: " + recurso.getId() + ", Tipo: " + recurso.getTipo() + ", Ubicacion: "
+                        + recurso.getUbicacionActual());
+            }
+        }
+        System.out.println("===============================================================\n");
     }
 
 }
