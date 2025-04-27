@@ -4,13 +4,19 @@ package com.jquiguantar.ues.patterns.singleton;
 //sabemos que esto garantizara que solo se pueda crear 
 //una única instancia de ella durante toda la ejecución del programa.
 import com.jquiguantar.ues.model.emergencies.Emergencia;
+
+import com.jquiguantar.ues.model.emergencies.EstadoEmergencia;
+import com.jquiguantar.ues.model.resources.TipoRecurso;
 import com.jquiguantar.ues.services.GestionEmergencia;
+
 import com.jquiguantar.ues.model.resources.Recursos;
 import com.jquiguantar.ues.services.AmbulanciaService;
 import com.jquiguantar.ues.services.BomberoService;
 import com.jquiguantar.ues.services.PoliciaService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;//Necesario para usar lambdas con streams
 
 public class SistemaGestionEmergencia {
     // Definimos los atributos de esta clase central que necesita para mantener el
@@ -66,19 +72,17 @@ public class SistemaGestionEmergencia {
 
     // Metodo para inicializar los recursos del sitema (crear instancias de recurso)
     private void inicializarRecursos() {
-        // Aqui creamos las instancias de los recursos, por ahora lo dejamos asi:
-        // recursosDisponibles.add(new Recursos("1", TipoRecurso.AMBULANCIAS_VEHICULO,
-        // "Local 1"));
-        // recursosDisponibles.add(new Recursos("2", TipoRecurso.BOMBEROS_UNIT, "Local
-        // 2"));
-        // recursosDisponibles.add(new Recursos("3", TipoRecurso.POLICIA_UNIT, "Local
-        // 3"));
-        // recursosDisponibles.add(new Recursos("4", TipoRecurso.BOMBEROS_PERSONAL,
-        // "Local 4"));
-        // recursosDisponibles.add(new Recursos("5", TipoRecurso.PARAMEDICO_PERSONAL,
-        // "Local 5"));
-        // recursosDisponibles.add(new Recursos("6", TipoRecurso.POLICIA_PERSONAL,
-        // "Local 6"));
+
+        // Logica para crear recursos iniciales
+
+        // Recursos de Bomberos
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.CamionBomberos("CB001", "Estacion Central"));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.CamionBomberos("C002", "Estacion Norte"));
+        recursosDisponibles
+                .add(new com.jquiguantar.ues.model.resources.BomberosPersonal("BOMP001", "Estacion Central"));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.BomberosPersonal("BOMP002", "Estacion Norte"));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.BomberosPersonal("BOMP003", "Estacion Sur"));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.BomberosPersonal("BOMP004", "Estacion Oeste"));
 
         // System.out.println("Recursos Inicializados...");
     }
