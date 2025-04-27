@@ -6,11 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-enum EstadoEmergencia {
-    PENDIENTE, EN_PROGRESO, RESUELTA, CERRADA, CANCELADA
-
-}
-
 public class Emergencia {
     private String id;
     private TipoEmergencia tipo;
