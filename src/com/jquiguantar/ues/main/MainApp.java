@@ -2,6 +2,9 @@ package com.jquiguantar.ues.main;
 
 import com.jquiguantar.ues.patterns.singleton.SistemaGestionEmergencia;
 import com.jquiguantar.ues.ui.ConsoleUI;
+
+import java.util.List;
+import com.jquiguantar.ues.model.resources.Recursos;
 import com.jquiguantar.ues.model.emergencies.Emergencia;
 import com.jquiguantar.ues.model.emergencies.TipoEmergencia;
 import com.jquiguantar.ues.model.emergencies.NivelGravedad;
@@ -36,6 +39,13 @@ public class MainApp {
                 case 2: // Ver el Estado Actual de Recursos
 
                     System.out.println("\n --- Estado Actual de Recursos ---");
+                    // 1. Obtener las listas de recursos Singleton
+                    List<Recursos> recursosDisponibles = sistema.getRecursosDisponibles();
+                    List<Recursos> recursosOcupados = sistema.getRecursosOcupados();
+                    ui.mostrarEstadoRecursos(recursosDisponibles, recursosOcupados);
+
+                    // 2. Pasar las listas a la UI para que las muestres
+                    ui.mostrarEstadoRecursos(recursosDisponibles, recursosOcupados);
 
                     break;
                 case 3: // Atender Emergencia
