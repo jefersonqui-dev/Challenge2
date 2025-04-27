@@ -84,7 +84,16 @@ public class SistemaGestionEmergencia {
         recursosDisponibles.add(new com.jquiguantar.ues.model.resources.BomberosPersonal("BOMP003", "Estacion Sur"));
         recursosDisponibles.add(new com.jquiguantar.ues.model.resources.BomberosPersonal("BOMP004", "Estacion Oeste"));
 
-        // System.out.println("Recursos Inicializados...");
+        // Recursos de Ambulancias
+        recursosDisponibles
+                .add(new com.jquiguantar.ues.model.resources.AmbulanciaVehiculo("AMB001", "Estacion Central"));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.AmbulanciaVehiculo("AMB002", "Estacion Norte"));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.ParamedicosPersonal("PAR001", "Estacion Sur"));
+        recursosDisponibles
+                .add(new com.jquiguantar.ues.model.resources.ParamedicosPersonal("PAR002", "Estacion Oeste"));
+
+        System.out.println(
+                "Recursos del sistema inicializados con " + recursosDisponibles.size() + " unidades disponibles.");
     }
 
     // METODO PARA REGISTRAR UNA NUEVA EMERGENCIA
