@@ -4,11 +4,12 @@ import com.jquiguantar.ues.model.emergencies.NivelGravedad;
 import com.jquiguantar.ues.model.emergencies.TipoEmergencia;
 //Importamos las clases concretas de tipos de emergencia que hemos creado(Incendio,accidenteVehicular,Robo, etc)
 import com.jquiguantar.ues.model.emergencies.AccidenteVehicular;
+import com.jquiguantar.ues.model.emergencies.Emergencia;
 import com.jquiguantar.ues.model.emergencies.Incendio;
 import com.jquiguantar.ues.model.emergencies.Robo;
 import com.jquiguantar.ues.model.resources.Recursos;
 import com.jquiguantar.ues.model.resources.TipoRecurso;
-
+import com.jquiguantar.ues.model.emergencies.EstadoEmergencia;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -169,6 +170,25 @@ public class ConsoleUI {
                 // Mustra la informacion basica de cada Recurso
                 System.out.println("ID: " + recurso.getId() + ", Tipo: " + recurso.getTipo() + ", Ubicacion: "
                         + recurso.getUbicacionActual());
+            }
+        }
+        System.out.println("===============================================================\n");
+    }
+
+    public void mostrarEmergencias(List<Emergencia> emergencias) {
+        System.out.println("\n--- EMERGENCIAS ACTIVAS (" + emergencias.size() + ") ---");
+        if (emergencias.isEmpty()) {
+            System.out.println("No hay emergencias registradas en este momento.");
+        } else {
+
+            for (Emergencia emergencia : emergencias) {
+                // Muestra los detalles claves de cada Emergencia
+                System.out.println("ID: " + emergencia.getId() +
+                        ", Tipo: " + emergencia.getTipo().getNombre() +
+                        ", Ubicacion: " + emergencia.getUbicacion() +
+                        ", Gravedad: " + emergencia.getNivelGravedad() +
+                        ", Estado: " + emergencia.getEstado() +
+                        ", Recursos Asignados: " + emergencia.getRecursosAsignados().size());
             }
         }
         System.out.println("===============================================================\n");
