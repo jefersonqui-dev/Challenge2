@@ -28,6 +28,33 @@ public class SistemaGestionEmergencia {
     public static final String BLUE = "\u001B[34m";     // Color amarillo
     public static final String BOLD = "\u001B[1m";      // Negrita
 
+    // Constantes para tiempos de espera (en milisegundos)
+    private static final int TIEMPO_BUSQUEDA = 1500;
+    private static final int TIEMPO_PROCESAMIENTO = 2000;
+    private static final int TIEMPO_ASIGNACION = 1000;
+
+    /**
+     * Simula un tiempo de espera con puntos de progreso
+     * @param tiempoEspera Tiempo total de espera en milisegundos
+     * @param mensaje Mensaje a mostrar durante la espera
+     */
+    private void simularProcesamiento(int tiempoEspera, String mensaje) {
+        System.out.print(mensaje);
+        int puntos = 0;
+        int intervalo = tiempoEspera / 4; // Dividir el tiempo en 4 partes
+
+        try {
+            for (int i = 0; i < 4; i++) {
+                Thread.sleep(intervalo);
+                System.out.print(".");
+                puntos++;
+            }
+            System.out.println(" ✓");
+        } catch (InterruptedException e) {
+            System.out.println("\n" + RED + "Error en el procesamiento" + RESET);
+        }
+    }
+
     // Definimos los atributos de esta clase central que necesita para mantener el
     // estado del sistema
     // (lista de emrgencias y recursos disponibles)
@@ -100,7 +127,6 @@ public class SistemaGestionEmergencia {
     public void registrarEmergencia(Emergencia emergencia) {
         if (emergencia != null) {
             this.emergenciasActivas.add(emergencia);
-            System.out.println(GREEN + "Emergencia Registrada..." + RESET);
             // Aqui podemos introducir el patron observer, pero lo haremos mas adelante
         }
     }
@@ -124,80 +150,148 @@ public class SistemaGestionEmergencia {
 
     // METODO PARA ASIGNAR RECURSOS
     public boolean asignarRecursosAEmergencia(String idEmergencia) {
-        System.out.println(YELLOW + "Asignando recursos a la emergencia con ID: " + idEmergencia + RESET);
-        // Busca la emergencia por ID
+        System.out.println(BOLD + BLUE + "\n--- INICIO ASIGNACIÓN DE RECURSOS --- ID: " + idEmergencia + RESET);
+
+        // 1. Validar y obtener la emergencia
+        Emergencia emergencia = validarYBuscarEmergencia(idEmergencia);
+        if (emergencia == null) {
+            // El mensaje de error ya se mostró en validarYBuscarEmergencia
+            System.out.println(RED + "--- Fin del Proceso: Emergencia no válida --- " + RESET);
+            return false;
+        }
+        // Mostrar detalles solo si es válida
+        System.out.println(GREEN + "  Emergencia válida: " + emergencia.getTipo().getNombre() + 
+                         " (" + emergencia.getNivelGravedad() + ")" + RESET);
+
+        // 2. Obtener recursos necesarios
+        simularProcesamiento(TIEMPO_PROCESAMIENTO, YELLOW + "  Calculando recursos necesarios" + RESET);
+        Map<TipoRecurso, Integer> recursosNecesarios = emergencia.getTipo()
+                .calcularRecursosInicialesNecesarios(emergencia.getNivelGravedad());
+        System.out.println(YELLOW + "  Recursos requeridos calculados." + RESET);
+
+        // 3. Asignar recursos por tipo
+        System.out.println(BOLD + BLUE + "\n--- Detalle de Asignación ---" + RESET);
+        boolean asignacionExitosa = asignarRecursosPorTipo(emergencia, recursosNecesarios);
+
+        // 4. Actualizar estado de la emergencia y finalizar
+        if (asignacionExitosa) {
+            simularProcesamiento(TIEMPO_ASIGNACION, YELLOW + "  Actualizando estado de la emergencia" + RESET);
+            emergencia.setEstado(EstadoEmergencia.EN_PROGRESO);
+            System.out.println(GREEN + "  Recursos asignados. Emergencia ID " + emergencia.getId() + 
+                             " ahora está " + emergencia.getEstado() + RESET);
+        } else {
+            System.out.println(RED + "  Recursos insuficientes para atender completamente la emergencia ID " + 
+                            emergencia.getId() + RESET);
+        }
+        System.out.println(BOLD + BLUE + "--- Fin del Proceso de Asignación --- " + RESET);
+
+        return asignacionExitosa;
+    }
+
+    /**
+     * Valida y busca una emergencia por su ID. Imprime error si no es válida.
+     * @param idEmergencia ID de la emergencia a buscar
+     * @return La emergencia encontrada o null si no es válida
+     */
+    private Emergencia validarYBuscarEmergencia(String idEmergencia) {
+        // Ya no simulamos proceso aquí, se valida directamente
         Optional<Emergencia> emergenciaOpt = emergenciasActivas.stream()
                 .filter(e -> e.getId().equals(idEmergencia))
                 .findFirst();
 
-        // verifica si seeleciono una emergencia y si esta en estado pendiente
         if (!emergenciaOpt.isPresent()) {
-            System.out.println(RED + "Error: Emergencia con ID: " + idEmergencia + " no encontrada o ya atendida." + RESET);
-            return false;
+            System.out.println(RED + "  Error: Emergencia con ID: " + idEmergencia + 
+                            " no encontrada." + RESET);
+            return null;
         }
+
         Emergencia emergencia = emergenciaOpt.get();
         if (emergencia.getEstado() != EstadoEmergencia.PENDIENTE) {
-            System.out.println(RED + "Error: Emergencia con ID: " + idEmergencia + " no esta PENDIENTE. Estado actual: "
-                    + emergencia.getEstado() + RESET);
-            return false;
-
+            System.out.println(RED + "  Error: Emergencia con ID: " + idEmergencia + 
+                            " no está PENDIENTE. Estado actual: " + 
+                            emergencia.getEstado() + RESET);
+            return null;
         }
-        System.out.println(YELLOW + "Procesando asignacion para emergencia: " + emergencia.getTipo().getNombre() + " ("
-                + emergencia.getNivelGravedad() + ")" + RESET);
+        // Si es válida, no imprimimos nada aquí, solo devolvemos el objeto
+        return emergencia;
+    }
 
-        // 2. Determinar los recursos necesarios usando el Polimorfismo
-        Map<TipoRecurso, Integer> recursosNecesarios = emergencia.getTipo()
-                .calcularRecursosInicialesNecesarios(emergencia.getNivelGravedad());
-        boolean recursosAsignadosExitosamente = false;
+    /**
+     * Asigna recursos por tipo a una emergencia
+     * @param emergencia Emergencia a la que asignar recursos
+     * @param recursosNecesarios Mapa de tipos de recursos y cantidades necesarias
+     * @return true si se asignaron recursos exitosamente (al menos uno)
+     */
+    private boolean asignarRecursosPorTipo(Emergencia emergencia, 
+                                         Map<TipoRecurso, Integer> recursosNecesarios) {
+        boolean asignacionGeneralExitosa = false;
+        boolean recursosSuficientes = true;
 
-        // 3. Iterar sobre los tipos de recursos necesarios y asignar los recursos
-        // disponibles
         for (Map.Entry<TipoRecurso, Integer> entry : recursosNecesarios.entrySet()) {
             TipoRecurso tipoNecesario = entry.getKey();
             int cantidadNecesaria = entry.getValue();
-            int cantidadAsignada = 0;
-            System.out.println(YELLOW + " -> Necesita " + cantidadNecesaria + " de tipo: " + tipoNecesario + RESET);
+            
+            System.out.println(YELLOW + "\n  Tipo: " + tipoNecesario + " | Necesarios: " + cantidadNecesaria + RESET);
 
-            // 4. Buscar y Asignar Recursos disponibles del tipo requerido(Usando Lambda
-            // para filtrar)
-            List<Recursos> recursosDelTipoDisponible = recursosDisponibles.stream()
-                    .filter(r -> r.getTipo() == tipoNecesario) // Filtro con lambda:
-                    .collect(Collectors.toList()); // recolecta los recursos filtrados en una lista
-            // Asignar hasta la cantidad necesaria o hasta agotar los recursos disponibles
-            for (int i = 0; i < cantidadNecesaria && i < recursosDelTipoDisponible.size(); i++) {
-                Recursos recursoAAsignar = recursosDelTipoDisponible.get(i);
+            // Obtener recursos disponibles del tipo requerido
+            simularProcesamiento(TIEMPO_BUSQUEDA, YELLOW + "    Buscando disponibles" + RESET);
+            List<Recursos> recursosDisponiblesDelTipo = recursosDisponibles.stream()
+                    .filter(r -> r.getTipo() == tipoNecesario)
+                    .collect(Collectors.toList());
+            System.out.println(YELLOW + "    Encontrados disponibles: " + recursosDisponiblesDelTipo.size() + RESET);
 
-                List<Recursos> recursosParaAsignar = recursosDelTipoDisponible.stream()
-                        .filter(r -> r.getId().equals(recursoAAsignar.getId()))
-                        .limit(cantidadAsignada)
-                        .collect(Collectors.toList());
-                for (Recursos recursos : recursosParaAsignar) {
-                    // Mover de disponibles a ocupados y actualizar estado/asignacion
-                    recursosDisponibles.remove(recursos);
-                    recursosOcupados.add(recursos);
-                    recursos.setDisponible(false);
-                    emergencia.agregarRecursoAsignado(recursos);
-                    cantidadAsignada++;
+            // Asignar recursos disponibles
+            simularProcesamiento(TIEMPO_ASIGNACION, YELLOW + "    Intentando asignar" + RESET);
+            int cantidadAsignada = asignarRecursosDisponibles(emergencia, 
+                                                            recursosDisponiblesDelTipo, 
+                                                            cantidadNecesaria);
+
+            if (cantidadAsignada > 0) {
+                System.out.println(GREEN + "    Asignados: " + cantidadAsignada + RESET);
+                asignacionGeneralExitosa = true; // Marcamos como exitosa si al menos un recurso se asignó
+                if (cantidadAsignada < cantidadNecesaria) {
+                    System.out.println(RED + "    Faltaron: " + (cantidadNecesaria - cantidadAsignada) + RESET);
+                    recursosSuficientes = false; // Marcamos que faltaron recursos
                 }
-                if (cantidadAsignada > 0) {
-                    recursosAsignadosExitosamente = true;
-                    System.out.println(GREEN + " -> Asignados: " + cantidadAsignada + " de tipo: " + tipoNecesario + RESET);
-                    recursosAsignadosExitosamente = true;
-                } else {
-                    System.out.println(RED + " -> No hay recursos disponibles del tipo: " + tipoNecesario + RESET);
-
-                }
-
-            }
-            // 5. Actualizar el estado de la emergencia si se asignaron recursos
-            if (recursosAsignadosExitosamente) {
-                emergencia.setEstado(EstadoEmergencia.EN_PROGRESO);
-                System.out.println(GREEN + "Estado de emergencia " + emergencia.getId() + " actualizado a: " + emergencia.getEstado() + RESET);
             } else {
-                System.out.println(RED + "No se pudieron asignar recursos a la emergencia " + emergencia.getId() + RESET);
+                System.out.println(RED + "    No se asignó ninguno (Insuficientes)." + RESET);
+                recursosSuficientes = false; // Marcamos que faltaron recursos
             }
-
         }
-        return recursosAsignadosExitosamente;
+        // Devolvemos true solo si se asignaron TODOS los recursos necesarios
+        // O podrías cambiarlo a devolver asignacionGeneralExitosa si quieres que EN_PROGRESO
+        // se active con asignación parcial.
+        return asignacionGeneralExitosa && recursosSuficientes; 
+    }
+
+    /**
+     * Asigna recursos disponibles a una emergencia (sin mensajes de consola)
+     * @param emergencia Emergencia a la que asignar recursos
+     * @param recursosDisponibles Lista de recursos disponibles
+     * @param cantidadNecesaria Cantidad de recursos necesarios
+     * @return Cantidad de recursos asignados
+     */
+    private int asignarRecursosDisponibles(Emergencia emergencia, 
+                                         List<Recursos> recursosDisponibles, 
+                                         int cantidadNecesaria) {
+        int cantidadAsignada = 0;
+
+        // Tomar solo los necesarios o los disponibles, lo que sea menor
+        int limiteAsignacion = Math.min(cantidadNecesaria, recursosDisponibles.size());
+
+        List<Recursos> aAsignar = new ArrayList<>(recursosDisponibles.subList(0, limiteAsignacion));
+
+        for (Recursos recurso : aAsignar) {
+            // Mover recurso de disponibles a ocupados
+            this.recursosDisponibles.remove(recurso);
+            this.recursosOcupados.add(recurso);
+            recurso.setDisponible(false);
+            
+            // Asignar recurso a la emergencia
+            emergencia.agregarRecursoAsignado(recurso);
+            cantidadAsignada++;
+        }
+
+        return cantidadAsignada;
     }
 }
