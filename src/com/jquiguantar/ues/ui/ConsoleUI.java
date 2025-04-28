@@ -22,6 +22,14 @@ public class ConsoleUI {
 
     private List<TipoEmergencia> TiposEmergenciaDisponibles;
 
+    // Constantes de colores que funcionan en la consola
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";      // Color piel
+    public static final String YELLOW = "\u001B[33m";   // Color violeta
+    public static final String GREEN = "\u001B[32m";    // Color verde claro
+    public static final String BLUE = "\u001B[34m";     // Color amarillo
+    public static final String BOLD = "\u001B[1m";      // Negrita
+
     // CONSTRUCTOR
 
     public ConsoleUI() {
@@ -55,15 +63,15 @@ public class ConsoleUI {
      */
     public void mostrarMenuPrincipal() {
         limpiarConsola();
-        System.out.println("===============================================");
-        System.out.println("    SISTEMA DE GESTIÓN DE EMERGENCIAS URBANAS");
-        System.out.println("===============================================");
+        System.out.println(BOLD + BLUE + "===============================================" + RESET);
+        System.out.println(BOLD + BLUE + "    SISTEMA DE GESTIÓN DE EMERGENCIAS URBANAS" + RESET);
+        System.out.println(BOLD + BLUE + "===============================================" + RESET);
         System.out.println("1. Registrar Emergencia");
         System.out.println("2. Ver Estado de Recursos");
         System.out.println("3. Atender Emergencia");
         System.out.println("4. Estadísticas del Día");
         System.out.println("5. Salir");
-        System.out.println("===============================================");
+        System.out.println(BOLD + BLUE + "===============================================" + RESET);
     }
 
     /**
@@ -75,12 +83,12 @@ public class ConsoleUI {
 
     public int leerOpcion() {
         int opcion = -1;
-        System.out.print("Por favor, ingrese el número de la opción deseada: ");
+        System.out.print(YELLOW + "Por favor, ingrese el número de la opción deseada: " + RESET);
         try {
             String input = scanner.nextLine();
             opcion = Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            System.out.println("Opción no válida. Intente nuevamente.");
+            System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
         }
         return opcion;
     }
@@ -100,8 +108,8 @@ public class ConsoleUI {
      */
     public TipoEmergencia solicitarTipoEmergencia() {
         limpiarConsola();
-        System.out.println("REGISTRAR NUEVA EMERGENCIA");
-        System.out.println("--------------------------");
+        System.out.println(BOLD + YELLOW + "REGISTRAR NUEVA EMERGENCIA" + RESET);
+        System.out.println(BOLD + YELLOW + "--------------------------" + RESET);
         System.out.println("Seleccione el tipo de emergencia:");
         
         for (int i = 0; i < TiposEmergenciaDisponibles.size(); i++) {
@@ -110,16 +118,17 @@ public class ConsoleUI {
 
         TipoEmergencia tipoSeleccionado = null;
         while (tipoSeleccionado == null) {
-            System.out.print("\nIngrese el número del tipo: ");
+            System.out.print(YELLOW + "\nIngrese el número del tipo: " + RESET);
             try {
-                int opcion = Integer.parseInt(scanner.nextLine());
+                String input = scanner.nextLine();
+                int opcion = Integer.parseInt(input);
                 if (opcion > 0 && opcion <= TiposEmergenciaDisponibles.size()) {
                     tipoSeleccionado = TiposEmergenciaDisponibles.get(opcion - 1);
                 } else {
-                    System.out.println("Opción no válida. Intente nuevamente.");
+                    System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Opción no válida. Intente nuevamente.");
+                System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
             }
         }
         return tipoSeleccionado;
@@ -131,7 +140,7 @@ public class ConsoleUI {
      * @return La ubicacion como String
      */
     public String solicitarUbicacion() {
-        System.out.print("\nIngrese la ubicación de la emergencia: ");
+        System.out.print(YELLOW + "\nIngrese la ubicación de la emergencia: " + RESET);
         return scanner.nextLine();
     }
 
@@ -145,8 +154,8 @@ public class ConsoleUI {
      */
 
     public NivelGravedad solicitarNivelGravedad() {
-        System.out.println("\nNIVEL DE GRAVEDAD");
-        System.out.println("-----------------");
+        System.out.println(BOLD + YELLOW + "\nNIVEL DE GRAVEDAD" + RESET);
+        System.out.println(BOLD + YELLOW + "-----------------" + RESET);
         
         NivelGravedad[] gravedades = NivelGravedad.values();
         for (int i = 0; i < gravedades.length; i++) {
@@ -155,16 +164,17 @@ public class ConsoleUI {
 
         NivelGravedad gravedadSeleccionada = null;
         while (gravedadSeleccionada == null) {
-            System.out.print("\nIngrese el número del nivel de gravedad: ");
+            System.out.print(YELLOW + "\nIngrese el número del nivel de gravedad: " + RESET);
             try {
-                int opcion = Integer.parseInt(scanner.nextLine());
+                String input = scanner.nextLine();
+                int opcion = Integer.parseInt(input);
                 if (opcion > 0 && opcion <= gravedades.length) {
                     gravedadSeleccionada = gravedades[opcion - 1];
                 } else {
-                    System.out.println("Opción no válida. Intente nuevamente.");
+                    System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Opción no válida. Intente nuevamente.");
+                System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
             }
         }
         return gravedadSeleccionada;
@@ -172,10 +182,10 @@ public class ConsoleUI {
 
     public void mostrarEstadoRecursos(List<Recursos> disponibles, List<Recursos> ocupados) {
         limpiarConsola();
-        System.out.println("ESTADO DE RECURSOS");
-        System.out.println("------------------");
+        System.out.println(BOLD + YELLOW + "ESTADO DE RECURSOS" + RESET);
+        System.out.println(BOLD + YELLOW + "------------------" + RESET);
         
-        System.out.println("\nRecursos Disponibles (" + disponibles.size() + "):");
+        System.out.println(GREEN + "\nRecursos Disponibles (" + disponibles.size() + "):" + RESET);
         if (disponibles.isEmpty()) {
             System.out.println("No hay recursos disponibles en este momento.");
         } else {
@@ -186,7 +196,7 @@ public class ConsoleUI {
             }
         }
         
-        System.out.println("\nRecursos Ocupados (" + ocupados.size() + "):");
+        System.out.println(RED + "\nRecursos Ocupados (" + ocupados.size() + "):" + RESET);
         if (ocupados.isEmpty()) {
             System.out.println("No hay recursos ocupados en este momento.");
         } else {
@@ -213,8 +223,8 @@ public class ConsoleUI {
 
     public void mostrarEmergenciasActivas(List<Emergencia> emergencias) {
         limpiarConsola();
-        System.out.println("EMERGENCIAS ACTIVAS");
-        System.out.println("-------------------");
+        System.out.println(BOLD + YELLOW + "EMERGENCIAS ACTIVAS" + RESET);
+        System.out.println(BOLD + YELLOW + "-------------------" + RESET);
         
         if (emergencias.isEmpty()) {
             System.out.println("No hay emergencias activas en este momento.");
@@ -238,18 +248,18 @@ public class ConsoleUI {
      * @return El ID de la emergencia a atender como String.
      */
     public String solicitarIdEmergenciaAAtender() {
-        System.out.println("Ingrese el ID de la emergencia a atender:");
+        System.out.print(YELLOW + "Ingrese el ID de la emergencia a atender: " + RESET);
         return scanner.nextLine();
     }
 
     public void mostrarMensajeExito(String mensaje) {
-        System.out.println("\n✓ " + mensaje);
+        System.out.println(GREEN + "\n✓ " + mensaje + RESET);
         System.out.println("\nPresione ENTER para continuar...");
         scanner.nextLine();
     }
 
     public void mostrarMensajeError(String mensaje) {
-        System.out.println("\n✗ " + mensaje);
+        System.out.println(RED + "\n✗ " + mensaje + RESET);
         System.out.println("\nPresione ENTER para continuar...");
         scanner.nextLine();
     }
