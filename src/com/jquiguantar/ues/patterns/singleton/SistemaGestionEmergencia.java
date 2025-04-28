@@ -20,6 +20,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;//Necesario para usar lambdas con streams
 
 public class SistemaGestionEmergencia {
+    // Constantes de colores que funcionan en la consola
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";      // Color piel
+    public static final String YELLOW = "\u001B[33m";   // Color violeta
+    public static final String GREEN = "\u001B[32m";    // Color verde claro
+    public static final String BLUE = "\u001B[34m";     // Color amarillo
+    public static final String BOLD = "\u001B[1m";      // Negrita
+
     // Definimos los atributos de esta clase central que necesita para mantener el
     // estado del sistema
     // (lista de emrgencias y recursos disponibles)
@@ -51,7 +59,7 @@ public class SistemaGestionEmergencia {
 
         // LLama a un metodo de inicializacion de recursos
         inicializarRecursos();
-        System.out.println("Sistema de Emergencias Urbanas Inicializado...");
+        System.out.println(BOLD + BLUE + "Sistema de Emergencias Urbanas Inicializado..." + RESET);
 
     }
 
@@ -92,7 +100,7 @@ public class SistemaGestionEmergencia {
     public void registrarEmergencia(Emergencia emergencia) {
         if (emergencia != null) {
             this.emergenciasActivas.add(emergencia);
-            System.out.println("Emergencia Registrada...");
+            System.out.println(GREEN + "Emergencia Registrada..." + RESET);
             // Aqui podemos introducir el patron observer, pero lo haremos mas adelante
         }
     }
@@ -116,7 +124,7 @@ public class SistemaGestionEmergencia {
 
     // METODO PARA ASIGNAR RECURSOS
     public boolean asignarRecursosAEmergencia(String idEmergencia) {
-        System.out.println("Asignando recursos a la emergencia con ID: " + idEmergencia);
+        System.out.println(YELLOW + "Asignando recursos a la emergencia con ID: " + idEmergencia + RESET);
         // Busca la emergencia por ID
         Optional<Emergencia> emergenciaOpt = emergenciasActivas.stream()
                 .filter(e -> e.getId().equals(idEmergencia))
@@ -124,18 +132,18 @@ public class SistemaGestionEmergencia {
 
         // verifica si seeleciono una emergencia y si esta en estado pendiente
         if (!emergenciaOpt.isPresent()) {
-            System.out.println("Error: Emergencia con ID: " + idEmergencia + " no encontrada o ya atendida.");
+            System.out.println(RED + "Error: Emergencia con ID: " + idEmergencia + " no encontrada o ya atendida." + RESET);
             return false;
         }
         Emergencia emergencia = emergenciaOpt.get();
         if (emergencia.getEstado() != EstadoEmergencia.PENDIENTE) {
-            System.out.println("Error: Emergencia con ID: " + idEmergencia + " no esta PENDIENTE. Estado actual: "
-                    + emergencia.getEstado());
+            System.out.println(RED + "Error: Emergencia con ID: " + idEmergencia + " no esta PENDIENTE. Estado actual: "
+                    + emergencia.getEstado() + RESET);
             return false;
 
         }
-        System.out.println("Procesando asignacion para emergencia: " + emergencia.getTipo().getNombre() + " ("
-                + emergencia.getNivelGravedad() + ")");
+        System.out.println(YELLOW + "Procesando asignacion para emergencia: " + emergencia.getTipo().getNombre() + " ("
+                + emergencia.getNivelGravedad() + ")" + RESET);
 
         // 2. Determinar los recursos necesarios usando el Polimorfismo
         Map<TipoRecurso, Integer> recursosNecesarios = emergencia.getTipo()
@@ -148,7 +156,7 @@ public class SistemaGestionEmergencia {
             TipoRecurso tipoNecesario = entry.getKey();
             int cantidadNecesaria = entry.getValue();
             int cantidadAsignada = 0;
-            System.out.println(" -> Necesita " + cantidadNecesaria + " de tipo: " + tipoNecesario);
+            System.out.println(YELLOW + " -> Necesita " + cantidadNecesaria + " de tipo: " + tipoNecesario + RESET);
 
             // 4. Buscar y Asignar Recursos disponibles del tipo requerido(Usando Lambda
             // para filtrar)
@@ -173,10 +181,10 @@ public class SistemaGestionEmergencia {
                 }
                 if (cantidadAsignada > 0) {
                     recursosAsignadosExitosamente = true;
-                    System.out.println(" -> Asignados: " + cantidadAsignada + " de tipo: " + tipoNecesario);
+                    System.out.println(GREEN + " -> Asignados: " + cantidadAsignada + " de tipo: " + tipoNecesario + RESET);
                     recursosAsignadosExitosamente = true;
                 } else {
-                    System.out.println(" -> No hay recursos disponibles del tipo: " + tipoNecesario);
+                    System.out.println(RED + " -> No hay recursos disponibles del tipo: " + tipoNecesario + RESET);
 
                 }
 
@@ -184,10 +192,9 @@ public class SistemaGestionEmergencia {
             // 5. Actualizar el estado de la emergencia si se asignaron recursos
             if (recursosAsignadosExitosamente) {
                 emergencia.setEstado(EstadoEmergencia.EN_PROGRESO);
-                System.out.println(
-                        "Estado de emergencia  " + emergencia.getId() + " actualizado a : " + emergencia.getEstado());
+                System.out.println(GREEN + "Estado de emergencia " + emergencia.getId() + " actualizado a: " + emergencia.getEstado() + RESET);
             } else {
-                System.out.println("No se pudieron asignar recursos a la emergencia " + emergencia.getId());
+                System.out.println(RED + "No se pudieron asignar recursos a la emergencia " + emergencia.getId() + RESET);
             }
 
         }
