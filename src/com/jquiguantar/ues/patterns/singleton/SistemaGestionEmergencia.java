@@ -15,6 +15,7 @@ import com.jquiguantar.ues.services.BomberoService;
 import com.jquiguantar.ues.services.PoliciaService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;//Necesario para usar lambdas con streams
 
@@ -111,5 +112,85 @@ public class SistemaGestionEmergencia {
 
     public List<GestionEmergencia> getServiciosOperacionales() {
         return serviciosOperacionales;
+    }
+
+    // METODO PARA ASIGNAR RECURSOS
+    public boolean asignarRecursosAEmergencia(String idEmergencia) {
+        System.out.println("Asignando recursos a la emergencia con ID: " + idEmergencia);
+        // Busca la emergencia por ID
+        Optional<Emergencia> emergenciaOpt = emergenciasActivas.stream()
+                .filter(e -> e.getId().equals(idEmergencia))
+                .findFirst();
+
+        // verifica si seeleciono una emergencia y si esta en estado pendiente
+        if (!emergenciaOpt.isPresent()) {
+            System.out.println("Error: Emergencia con ID: " + idEmergencia + " no encontrada o ya atendida.");
+            return false;
+        }
+        Emergencia emergencia = emergenciaOpt.get();
+        if (emergencia.getEstado() != EstadoEmergencia.PENDIENTE) {
+            System.out.println("Error: Emergencia con ID: " + idEmergencia + " no esta PENDIENTE. Estado actual: "
+                    + emergencia.getEstado());
+            return false;
+
+        }
+        System.out.println("Procesando asignacion para emergencia: " + emergencia.getTipo().getNombre() + " ("
+                + emergencia.getNivelGravedad() + ")");
+
+        // 2. Determinar los recursos necesarios usando el Polimorfismo
+        Map<TipoRecurso, Integer> recursosNecesarios = emergencia.getTipo()
+                .calcularRecursosInicialesNecesarios(emergencia.getNivelGravedad());
+        boolean recursosAsignadosExitosamente = false;
+
+        // 3. Iterar sobre los tipos de recursos necesarios y asignar los recursos
+        // disponibles
+        for (Map.Entry<TipoRecurso, Integer> entry : recursosNecesarios.entrySet()) {
+            TipoRecurso tipoNecesario = entry.getKey();
+            int cantidadNecesaria = entry.getValue();
+            int cantidadAsignada = 0;
+            System.out.println(" -> Necesita " + cantidadNecesaria + " de tipo: " + tipoNecesario);
+
+            // 4. Buscar y Asignar Recursos disponibles del tipo requerido(Usando Lambda
+            // para filtrar)
+            List<Recursos> recursosDelTipoDisponible = recursosDisponibles.stream()
+                    .filter(r -> r.getTipo() == tipoNecesario) // Filtro con lambda:
+                    .collect(Collectors.toList()); // recolecta los recursos filtrados en una lista
+            // Asignar hasta la cantidad necesaria o hasta agotar los recursos disponibles
+            for (int i = 0; i < cantidadNecesaria && i < recursosDelTipoDisponible.size(); i++) {
+                Recursos recursoAAsignar = recursosDelTipoDisponible.get(i);
+
+                List<Recursos> recursosParaAsignar = recursosDelTipoDisponible.stream()
+                        .filter(r -> r.getId().equals(recursoAAsignar.getId()))
+                        .limit(cantidadAsignada)
+                        .collect(Collectors.toList());
+                for (Recursos recursos : recursosParaAsignar) {
+                    // Mover de disponibles a ocupados y actualizar estado/asignacion
+                    recursosDisponibles.remove(recursos);
+                    recursosOcupados.add(recursos);
+                    recursos.setDisponible(false);
+                    emergencia.agregarRecursoAsignado(recursos);
+                    cantidadAsignada++;
+                }
+                if (cantidadAsignada > 0) {
+                    recursosAsignadosExitosamente = true;
+                    System.out.println(" -> Asignados: " + cantidadAsignada + " de tipo: " + tipoNecesario);
+                    recursosAsignadosExitosamente = true;
+                } else {
+                    System.out.println(" -> No hay recursos disponibles del tipo: " + tipoNecesario);
+
+                }
+
+            }
+            // 5. Actualizar el estado de la emergencia si se asignaron recursos
+            if (recursosAsignadosExitosamente) {
+                emergencia.setEstado(EstadoEmergencia.EN_PROGRESO);
+                System.out.println(
+                        "Estado de emergencia  " + emergencia.getId() + " actualizado a : " + emergencia.getEstado());
+            } else {
+                System.out.println("No se pudieron asignar recursos a la emergencia " + emergencia.getId());
+            }
+
+        }
+        return recursosAsignadosExitosamente;
     }
 }

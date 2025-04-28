@@ -4,11 +4,12 @@ import com.jquiguantar.ues.model.emergencies.NivelGravedad;
 import com.jquiguantar.ues.model.emergencies.TipoEmergencia;
 //Importamos las clases concretas de tipos de emergencia que hemos creado(Incendio,accidenteVehicular,Robo, etc)
 import com.jquiguantar.ues.model.emergencies.AccidenteVehicular;
+import com.jquiguantar.ues.model.emergencies.Emergencia;
 import com.jquiguantar.ues.model.emergencies.Incendio;
 import com.jquiguantar.ues.model.emergencies.Robo;
 import com.jquiguantar.ues.model.resources.Recursos;
 import com.jquiguantar.ues.model.resources.TipoRecurso;
-
+import com.jquiguantar.ues.model.emergencies.EstadoEmergencia;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -173,5 +174,47 @@ public class ConsoleUI {
         }
         System.out.println("===============================================================\n");
     }
+
+    /**
+     * Muestra la lista de emergencias activas en el sistema.
+     * 
+     * Imprime los detalles de cada emergencia activa, incluyendo su ID, tipo,
+     * ubicación, nivel de gravedad, estado, y la cantidad de recursos asignados.
+     * Si no hay emergencias activas, indica que no hay emergencias registradas
+     * en el momento.
+     * 
+     * @param emergencias La lista de emergencias activas a mostrar.
+     */
+
+    public void mostrarEmergenciasActivas(List<Emergencia> emergencias) {
+        System.out.println("\n--- EMERGENCIAS ACTIVAS (" + emergencias.size() + ") ---");
+        if (emergencias.isEmpty()) {
+            System.out.println("No hay emergencias registradas en este momento.");
+        } else {
+
+            for (Emergencia emergencia : emergencias) {
+                // Muestra los detalles claves de cada Emergencia
+                System.out.println("ID: " + emergencia.getId() +
+                        ", Tipo: " + emergencia.getTipo().getNombre() +
+                        ", Ubicacion: " + emergencia.getUbicacion() +
+                        ", Gravedad: " + emergencia.getNivelGravedad() +
+                        ", Estado: " + emergencia.getEstado() +
+                        ", Recursos Asignados: " + emergencia.getRecursosAsignados().size());
+            }
+        }
+        System.out.println("===============================================================\n");
+    }
+
+    /**
+     * Solicita al usuario que ingrese el ID de una emergencia activa
+     * para atender.
+     * 
+     * @return El ID de la emergencia a atender como String.
+     */
+    public String solicitarIdEmergenciaAAtender() {
+        System.out.println("Ingrese el ID de la emergencia a atender:");
+        return scanner.nextLine();
+    }
+    // Mostrar estadisticas...
 
 }
