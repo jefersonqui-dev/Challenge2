@@ -175,7 +175,18 @@ public class ConsoleUI {
         System.out.println("===============================================================\n");
     }
 
-    public void mostrarEmergencias(List<Emergencia> emergencias) {
+    /**
+     * Muestra la lista de emergencias activas en el sistema.
+     * 
+     * Imprime los detalles de cada emergencia activa, incluyendo su ID, tipo,
+     * ubicación, nivel de gravedad, estado, y la cantidad de recursos asignados.
+     * Si no hay emergencias activas, indica que no hay emergencias registradas
+     * en el momento.
+     * 
+     * @param emergencias La lista de emergencias activas a mostrar.
+     */
+
+    public void mostrarEmergenciasActivas(List<Emergencia> emergencias) {
         System.out.println("\n--- EMERGENCIAS ACTIVAS (" + emergencias.size() + ") ---");
         if (emergencias.isEmpty()) {
             System.out.println("No hay emergencias registradas en este momento.");
@@ -194,6 +205,16 @@ public class ConsoleUI {
         System.out.println("===============================================================\n");
     }
 
+    /**
+     * Solicita al usuario que ingrese el ID de una emergencia activa
+     * para atender.
+     * 
+     * @return El ID de la emergencia a atender como String.
+     */
+    public String solicitarIdEmergenciaAAtender() {
+        System.out.println("Ingrese el ID de la emergencia a atender:");
+        return scanner.nextLine();
+    }
     // Mostrar estadisticas...
 
 }

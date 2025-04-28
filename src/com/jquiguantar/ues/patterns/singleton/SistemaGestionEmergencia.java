@@ -112,4 +112,5 @@ public class SistemaGestionEmergencia {
     public List<GestionEmergencia> getServiciosOperacionales() {
         return serviciosOperacionales;
     }
+
 }

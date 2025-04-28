@@ -50,6 +50,20 @@ public class MainApp {
                     break;
                 case 3: // Atender Emergencia
                     System.out.println("\n --- Atender Emergencia ---");
+                    // 1. Obtener y Mostrar Emergencias activas
+                    List<Emergencia> emergenciasActivas = sistema.getEmergenciasActivas();
+                    ui.mostrarEmergenciasActivas(emergenciasActivas);
+                    // 2. Si hay Emergencias activas, solicitar al usuario cual atender
+                    if (!emergenciasActivas.isEmpty()) {
+                        String idSeleccionado = ui.solicitarIdEmergenciaAAtender();
+                        // 3. Llamar al metodo de asignacion en el Singleton
+                        boolean asignacionExitosa = sistema.asignarRecursosAEmergencia(idSeleccionado);
+                        Emergencia emergenciaSeleccionada = emergenciasActivas.get(idEmergencia - 1);
+                        sistema.atenderEmergencia(emergenciaSeleccionada);
+                        System.out.println("Emergencia atendida con exito...");
+                    } else {
+                        System.out.println("No hay emergencias activas para atender.");
+                    }
                     break;
                 case 4: // Mostrar Estadisticas del Dia
                     System.out.println("\n --- Estadisticas del Dia ---");
