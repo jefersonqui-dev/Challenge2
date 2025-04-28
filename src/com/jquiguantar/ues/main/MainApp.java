@@ -11,84 +11,78 @@ import com.jquiguantar.ues.model.emergencies.NivelGravedad;
 
 public class MainApp {
     public static void main(String[] args) {
-        System.out.println("Iniciando Sistema De Emergencias Urbanas...");
+        ConsoleUI ui = new ConsoleUI();
+        ui.limpiarConsola();
+        System.out.println("===============================================");
+        System.out.println("    SISTEMA DE GESTIÓN DE EMERGENCIAS URBANAS");
+        System.out.println("===============================================");
+        System.out.println("Iniciando sistema...\n");
 
         SistemaGestionEmergencia sistema = SistemaGestionEmergencia.getInstance();
-
-        ConsoleUI ui = new ConsoleUI();
         int opcion = 0;
-        // Iniciamos el bucle pricipal de la aplicacion
+
         while (opcion != 5) {
             ui.mostrarMenuPrincipal();
             opcion = ui.leerOpcion();
             switch (opcion) {
                 case 1: // Registrar Emergencia
-                    System.out.println("\n --- Registrar Nueva Emergencia ---");
-                    // 1. Solicitar detalles usando la UI
                     TipoEmergencia tipo = ui.solicitarTipoEmergencia();
                     String ubicacion = ui.solicitarUbicacion();
                     NivelGravedad gravedad = ui.solicitarNivelGravedad();
 
-                    // 2. Crear la instancia de emergencia
-                    // Luego refactorizaremos para implementar el patron Factory
                     Emergencia emergencia = new Emergencia(tipo, ubicacion, gravedad);
-                    // 3. Registrar la emergencia en el sistema
                     sistema.registrarEmergencia(emergencia);
-                    System.out.println("Emergencia Registrada con exito...");
+                    ui.mostrarMensajeExito("Emergencia registrada exitosamente");
                     break;
-                case 2: // Ver el Estado Actual de Recursos
 
-                    System.out.println("\n --- Estado Actual de Recursos ---");
-                    // 1. Obtener las listas de recursos Singleton
+                case 2: // Ver el Estado Actual de Recursos
                     List<Recursos> recursosDisponibles = sistema.getRecursosDisponibles();
                     List<Recursos> recursosOcupados = sistema.getRecursosOcupados();
                     ui.mostrarEstadoRecursos(recursosDisponibles, recursosOcupados);
-
-                    // 2. Pasar las listas a la UI para que las muestres
-                    ui.mostrarEstadoRecursos(recursosDisponibles, recursosOcupados);
-
                     break;
+
                 case 3: // Atender Emergencia
-                    System.out.println("\n --- Atender Emergencia ---");
-                    // 1. Obtener y Mostrar Emergencias activas
                     List<Emergencia> emergenciasActivas = sistema.getEmergenciasActivas();
                     ui.mostrarEmergenciasActivas(emergenciasActivas);
-                    // 2. Si hay Emergencias activas, solicitar al usuario cual atender
+                    
                     if (!emergenciasActivas.isEmpty()) {
                         String idSeleccionado = ui.solicitarIdEmergenciaAAtender();
-                        // 3. Llamar al metodo de asignacion en el Singleton
                         boolean asignacionExitosa = sistema.asignarRecursosAEmergencia(idSeleccionado);
-                        // 4 informar al usuario el resultado
+                        
                         if (asignacionExitosa) {
-                            System.out.println(
-                                    "Recursos asignados exitosamente a la emergencia con ID: " + idSeleccionado);
+                            ui.mostrarMensajeExito("Recursos asignados exitosamente a la emergencia ID: " + idSeleccionado);
                         } else {
-                            System.out.println(
-                                    "No se pudieron asignar recursos a la emergencia con ID: " + idSeleccionado);
+                            ui.mostrarMensajeError("No se pudieron asignar recursos a la emergencia ID: " + idSeleccionado);
                         }
                     } else {
-                        System.out.println("No hay emergencias activas para atender.");
+                        ui.mostrarMensajeError("No hay emergencias activas para atender");
                     }
                     break;
+
                 case 4: // Mostrar Estadisticas del Dia
-                    System.out.println("\n --- Estadisticas del Dia ---");
+                    ui.limpiarConsola();
+                    System.out.println("ESTADÍSTICAS DEL DÍA");
+                    System.out.println("--------------------");
+                    System.out.println("Esta funcionalidad estará disponible próximamente.");
+                    System.out.println("\nPresione ENTER para continuar...");
+                    ui.scanner.nextLine();
                     break;
+
                 case 5: // Finalizar la jornada y salir
-                    System.out.println("\n --- Finalizar la jornada y salir ---");
+                    ui.limpiarConsola();
+                    System.out.println("===============================================");
+                    System.out.println("    SISTEMA DE GESTIÓN DE EMERGENCIAS URBANAS");
+                    System.out.println("===============================================");
+                    System.out.println("Gracias por usar el sistema. ¡Hasta pronto!");
                     break;
+
                 default:
                     if (opcion != -1) {
-                        System.out.println("Opcion no valida. Intente nuevamente.");
+                        ui.mostrarMensajeError("Opción no válida. Por favor, intente nuevamente.");
                     }
                     break;
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
         ui.cerrarScanner();
-        System.out.println("Sistema de Emergencias Urbanas Finalizado.");
     }
 }
