@@ -14,14 +14,18 @@ public class ConsolaManager {
     public static final String BOLD = "\u001B[1m";
 
     // Constantes para el diseño
-    private static final int ANCHO_PANEL = 40;
+    private static final int ANCHO_PANEL = 30;
     private static final int ANCHO_TOTAL = 100;
+    private static final int ALTO_TOTAL = 15;
     private static final String LINEA_HORIZONTAL = "═";
     private static final String LINEA_VERTICAL = "║";
     private static final String ESQUINA_SUP_IZQ = "╔";
     private static final String ESQUINA_SUP_DER = "╗";
     private static final String ESQUINA_INF_IZQ = "╚";
     private static final String ESQUINA_INF_DER = "╝";
+    private static final String SEPARADOR_VERTICAL = "║";
+    private static final String SEPARADOR_HORIZONTAL = "═";
+    private static final String BULLET = "-";
 
     private List<Emergencia> emergenciasActivas;
     private List<Recursos> recursosDisponibles;
@@ -41,15 +45,79 @@ public class ConsolaManager {
     public void dibujarMarco() {
         // Dibujar línea superior
         System.out.print(ESQUINA_SUP_IZQ);
-        for (int i = 0; i < ANCHO_TOTAL - 2; i++) {
+        for (int i = 0; i < ANCHO_TOTAL - ANCHO_PANEL - 3; i++) {
+            System.out.print(LINEA_HORIZONTAL);
+        }
+        System.out.print(ESQUINA_SUP_DER);
+        for (int i = 0; i < ANCHO_PANEL; i++) {
             System.out.print(LINEA_HORIZONTAL);
         }
         System.out.println(ESQUINA_SUP_DER);
 
+        // Dibujar encabezados
+        System.out.print(LINEA_VERTICAL);
+        
+        // Panel izquierdo
+        String tituloPrincipal = "SISTEMA DE GESTION DE EMERGENCIAS";
+        int anchoPanelPrincipal = ANCHO_TOTAL - ANCHO_PANEL - 3;
+        int espaciosIzquierda = (anchoPanelPrincipal - tituloPrincipal.length()) / 2;
+        
+        // Imprimir espacios antes del título
+        for (int i = 0; i < espaciosIzquierda; i++) {
+            System.out.print(" ");
+        }
+        
+        // Imprimir título principal
+        System.out.print(BOLD + BLUE + tituloPrincipal + RESET);
+        
+        // Imprimir espacios después del título
+        int espaciosRestantes = anchoPanelPrincipal - espaciosIzquierda - tituloPrincipal.length();
+        for (int i = 0; i < espaciosRestantes; i++) {
+            System.out.print(" ");
+        }
+        
+        // Separador vertical
+        System.out.print(LINEA_VERTICAL);
+        
+        // Panel derecho
+        String tituloPanel = "PANEL DE ESTADO";
+        int espaciosDerecha = (ANCHO_PANEL - tituloPanel.length()) / 2;
+        
+        // Imprimir espacios antes del título del panel
+        for (int i = 0; i < espaciosDerecha; i++) {
+            System.out.print(" ");
+        }
+        
+        // Imprimir título del panel
+        System.out.print(BOLD + YELLOW + tituloPanel + RESET);
+        
+        // Imprimir espacios después del título del panel
+        int espaciosRestantesDerecha = ANCHO_PANEL - espaciosDerecha - tituloPanel.length();
+        for (int i = 0; i < espaciosRestantesDerecha; i++) {
+            System.out.print(" ");
+        }
+        
+        System.out.println(LINEA_VERTICAL);
+
+        // Dibujar línea divisoria
+        System.out.print(LINEA_VERTICAL);
+        for (int i = 0; i < ANCHO_TOTAL - ANCHO_PANEL - 3; i++) {
+            System.out.print(SEPARADOR_HORIZONTAL);
+        }
+        System.out.print(LINEA_VERTICAL);
+        for (int i = 0; i < ANCHO_PANEL; i++) {
+            System.out.print(SEPARADOR_HORIZONTAL);
+        }
+        System.out.println(LINEA_VERTICAL);
+
         // Dibujar líneas verticales
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < ALTO_TOTAL - 3; i++) {
             System.out.print(LINEA_VERTICAL);
-            for (int j = 0; j < ANCHO_TOTAL - 2; j++) {
+            for (int j = 0; j < ANCHO_TOTAL - ANCHO_PANEL - 3; j++) {
+                System.out.print(" ");
+            }
+            System.out.print(LINEA_VERTICAL);
+            for (int j = 0; j < ANCHO_PANEL; j++) {
                 System.out.print(" ");
             }
             System.out.println(LINEA_VERTICAL);
@@ -57,7 +125,11 @@ public class ConsolaManager {
 
         // Dibujar línea inferior
         System.out.print(ESQUINA_INF_IZQ);
-        for (int i = 0; i < ANCHO_TOTAL - 2; i++) {
+        for (int i = 0; i < ANCHO_TOTAL - ANCHO_PANEL - 3; i++) {
+            System.out.print(LINEA_HORIZONTAL);
+        }
+        System.out.print(ESQUINA_INF_DER);
+        for (int i = 0; i < ANCHO_PANEL; i++) {
             System.out.print(LINEA_HORIZONTAL);
         }
         System.out.println(ESQUINA_INF_DER);
@@ -65,48 +137,61 @@ public class ConsolaManager {
 
     public void mostrarPanelLateral() {
         // Posicionar el cursor para el panel lateral
-        System.out.print("\033[2;60H"); // Mover a la columna 60, fila 2
-        
-        // Título del panel
-        System.out.println(BOLD + YELLOW + "═ PANEL DE ESTADO ═" + RESET);
+        int posicionPanelX = ANCHO_TOTAL - ANCHO_PANEL + 2;
         
         // Emergencias activas
-        System.out.println(BOLD + BLUE + "\nEmergencias Activas: " + RESET + emergenciasActivas.size());
+        System.out.print("\033[4;" + posicionPanelX + "H");
+        System.out.println(BOLD + BLUE + "Emergencias Activas: " + RESET + emergenciasActivas.size());
+        int linea = 5;
         for (Emergencia e : emergenciasActivas) {
-            System.out.println("• " + e.getTipo().getNombre() + " (" + e.getNivelGravedad() + ")");
+            System.out.print("\033[" + linea + ";" + posicionPanelX + "H");
+            System.out.println(BULLET + " " + e.getTipo().getNombre() + 
+                             " (" + e.getNivelGravedad() + ")");
+            linea++;
         }
 
         // Recursos disponibles
-        System.out.println(BOLD + GREEN + "\nRecursos Disponibles: " + RESET + recursosDisponibles.size());
+        linea += 1;
+        System.out.print("\033[" + linea + ";" + posicionPanelX + "H");
+        System.out.println(BOLD + GREEN + "Recursos Disponibles: " + RESET + recursosDisponibles.size());
+        linea++;
         for (Recursos r : recursosDisponibles) {
-            System.out.println("• " + r.getTipo() + " (" + r.getId() + ")");
+            System.out.print("\033[" + linea + ";" + posicionPanelX + "H");
+            System.out.println(BULLET + " " + r.getTipo() + " (" + r.getId() + ")");
+            linea++;
         }
 
         // Recursos ocupados
-        System.out.println(BOLD + RED + "\nRecursos Ocupados: " + RESET + recursosOcupados.size());
+        linea += 1;
+        System.out.print("\033[" + linea + ";" + posicionPanelX + "H");
+        System.out.println(BOLD + RED + "Recursos Ocupados: " + RESET + recursosOcupados.size());
+        linea++;
         for (Recursos r : recursosOcupados) {
-            System.out.println("• " + r.getTipo() + " (" + r.getId() + ")");
+            System.out.print("\033[" + linea + ";" + posicionPanelX + "H");
+            System.out.println(BULLET + " " + r.getTipo() + " (" + r.getId() + ")");
+            linea++;
         }
     }
 
     public void mostrarMenuPrincipal() {
-        // Posicionar el cursor para el menú principal
-        System.out.print("\033[2;2H"); // Mover a la columna 2, fila 2
-        
-        System.out.println(BOLD + BLUE + "SISTEMA DE GESTION DE EMERGENCIAS URBANAS" + RESET);
-        System.out.println("\nSeleccione una opción:");
-        System.out.println("1. Registrar Emergencia");
-        System.out.println("2. Ver Estado de Recursos");
-        System.out.println("3. Atender Emergencia");
-        System.out.println("4. Mostrar Estadísticas");
-        System.out.println("5. Salir");
-        System.out.print("\nOpción: ");
+        // Solo dibujar el marco y el panel lateral
+        dibujarMarco();
+        mostrarPanelLateral();
+    }
+
+    public void limpiarAreaEntrada() {
+        // Limpiar el área donde se muestra la opción seleccionada
+        System.out.print("\033[13;3H"); // Posicionar en la línea de entrada
+        System.out.print("\033[K");     // Limpiar la línea actual
+        System.out.print("\033[14;3H"); // Posicionar en la siguiente línea
+        System.out.print("\033[K");     // Limpiar la siguiente línea
+        System.out.print("\033[15;3H"); // Posicionar en la siguiente línea
+        System.out.print("\033[K");     // Limpiar la siguiente línea
     }
 
     public void actualizarConsola() {
         limpiarConsola();
-        dibujarMarco();
-        mostrarPanelLateral();
         mostrarMenuPrincipal();
+        limpiarAreaEntrada();
     }
 } 

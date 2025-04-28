@@ -32,9 +32,16 @@ public class MainApp {
                 sistema.getRecursosDisponibles(),
                 sistema.getRecursosOcupados()
             );
+            
+            // Limpiar y mostrar el marco y panel lateral
             consola.actualizarConsola();
-
+            
+            // Mostrar el menú principal
+            ui.mostrarMenuPrincipal();
+            
+            // Leer la opción del usuario
             opcion = ui.leerOpcion();
+            
             switch (opcion) {
                 case 1: // Registrar Emergencia
                     System.out.print("\033[8;2H"); // Posicionar cursor
@@ -45,7 +52,7 @@ public class MainApp {
 
                     Emergencia emergencia = new Emergencia(tipo, ubicacion, gravedad);
                     sistema.registrarEmergencia(emergencia);
-                    System.out.println(GREEN + "Emergencia Registrada con exito..." + RESET);
+                    System.out.println(GREEN + "Emergencia Registrada con éxito..." + RESET);
                     break;
 
                 case 2: // Ver el Estado Actual de Recursos
@@ -72,9 +79,9 @@ public class MainApp {
                     }
                     break;
 
-                case 4: // Mostrar Estadisticas del Dia
+                case 4: // Mostrar Estadísticas del Dia
                     System.out.print("\033[8;2H"); // Posicionar cursor
-                    System.out.println(YELLOW + "\n--- Estadisticas del Dia ---" + RESET);
+                    System.out.println(YELLOW + "\n--- Estadísticas del Día ---" + RESET);
                     break;
 
                 case 5: // Finalizar la jornada y salir
@@ -85,7 +92,7 @@ public class MainApp {
                 default:
                     if (opcion != -1) {
                         System.out.print("\033[8;2H"); // Posicionar cursor
-                        System.out.println(RED + "Opcion no valida. Intente nuevamente." + RESET);
+                        System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
                     }
                     break;
             }
