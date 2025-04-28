@@ -14,9 +14,9 @@ public class ConsolaManager {
     public static final String BOLD = "\u001B[1m";
 
     // Constantes para el diseño
-    private static final int ANCHO_PANEL = 30;
+    private static final int ANCHO_PANEL = 38;
     private static final int ANCHO_TOTAL = 100;
-    private static final int ALTO_TOTAL = 15;
+    private static final int ALTO_TOTAL = 16;
     private static final String LINEA_HORIZONTAL = "═";
     private static final String LINEA_VERTICAL = "║";
     private static final String ESQUINA_SUP_IZQ = "╔";
@@ -113,7 +113,7 @@ public class ConsolaManager {
         // Dibujar líneas verticales
         for (int i = 0; i < ALTO_TOTAL - 3; i++) {
             System.out.print(LINEA_VERTICAL);
-            for (int j = 0; j < ANCHO_TOTAL - ANCHO_PANEL - 3; j++) {
+            for (int j =0; j < ANCHO_TOTAL - ANCHO_PANEL - 3; j++) {
                 System.out.print(" ");
             }
             System.out.print(LINEA_VERTICAL);
@@ -137,7 +137,7 @@ public class ConsolaManager {
 
     public void mostrarPanelLateral() {
         // Posicionar el cursor para el panel lateral
-        int posicionPanelX = ANCHO_TOTAL - ANCHO_PANEL + 2;
+        int posicionPanelX = ANCHO_TOTAL - ANCHO_PANEL + 1; // Ajustado para mover más a la izquierda
         
         // Emergencias activas
         System.out.print("\033[4;" + posicionPanelX + "H");
@@ -189,7 +189,22 @@ public class ConsolaManager {
         System.out.print("\033[K");     // Limpiar la siguiente línea
     }
 
+    public void limpiarAreaContenido() {
+        // Limpiar solo el área de contenido (líneas 5-15)
+        for (int i = 5; i <= 15; i++) {
+            System.out.print("\033[" + i + ";3H");
+            System.out.print(" ".repeat(50)); // Limpiar la línea
+        }
+    }
+
     public void actualizarConsola() {
+        // Solo limpiar el área de contenido y el área de entrada
+        limpiarAreaContenido();
+        limpiarAreaEntrada();
+    }
+
+    public void actualizarConsolaCompleta() {
+        // Este método se usará solo al inicio o cuando sea necesario limpiar todo
         limpiarConsola();
         mostrarMenuPrincipal();
         limpiarAreaEntrada();

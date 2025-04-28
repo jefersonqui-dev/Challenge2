@@ -33,8 +33,12 @@ public class MainApp {
                 sistema.getRecursosOcupados()
             );
             
-            // Limpiar y mostrar el marco y panel lateral
-            consola.actualizarConsola();
+            // Limpiar y mostrar el marco y panel lateral solo al inicio
+            if (opcion == 0) {
+                consola.actualizarConsolaCompleta();
+            } else {
+                consola.actualizarConsola();
+            }
             
             // Mostrar el menú principal
             ui.mostrarMenuPrincipal();
@@ -44,62 +48,60 @@ public class MainApp {
             
             switch (opcion) {
                 case 1: // Registrar Emergencia
-                    System.out.print("\033[8;2H"); // Posicionar cursor
-                    System.out.println(YELLOW + "\n--- REGISTRO DE NUEVA EMERGENCIA ---" + RESET);
+                    consola.actualizarConsola(); // Limpiar solo el área de contenido
                     TipoEmergencia tipo = ui.solicitarTipoEmergencia();
                     String ubicacion = ui.solicitarUbicacion();
                     NivelGravedad gravedad = ui.solicitarNivelGravedad();
 
                     Emergencia emergencia = new Emergencia(tipo, ubicacion, gravedad);
                     sistema.registrarEmergencia(emergencia);
-                    System.out.println(GREEN + "Emergencia Registrada con éxito..." + RESET);
+                    System.out.println(GREEN + "Emergencia registrada exitosamente" + RESET);
+                    ui.esperarEntradaUsuario();
                     break;
 
                 case 2: // Ver el Estado Actual de Recursos
-                    System.out.print("\033[8;2H"); // Posicionar cursor
+                    consola.actualizarConsola(); // Limpiar solo el área de contenido
                     List<Recursos> recursosDisponibles = sistema.getRecursosDisponibles();
                     List<Recursos> recursosOcupados = sistema.getRecursosOcupados();
                     ui.mostrarEstadoRecursos(recursosDisponibles, recursosOcupados);
+                    ui.esperarEntradaUsuario();
                     break;
 
                 case 3: // Atender Emergencia
-                    System.out.print("\033[8;2H"); // Posicionar cursor
+                    consola.actualizarConsola(); // Limpiar solo el área de contenido
                     List<Emergencia> emergenciasActivas = sistema.getEmergenciasActivas();
                     ui.mostrarEmergenciasActivas(emergenciasActivas);
-                    if (!emergenciasActivas.isEmpty()) {
-                        String idSeleccionado = ui.solicitarIdEmergenciaAAtender();
-                        boolean asignacionExitosa = sistema.asignarRecursosAEmergencia(idSeleccionado);
-                        if (asignacionExitosa) {
-                            System.out.println(GREEN + "Recursos asignados exitosamente a la emergencia con ID: " + idSeleccionado + RESET);
-                        } else {
-                            System.out.println(RED + "No se pudieron asignar recursos a la emergencia con ID: " + idSeleccionado + RESET);
-                        }
+                    String idEmergencia = ui.solicitarIdEmergenciaAAtender();
+                    boolean asignacionExitosa = sistema.asignarRecursosAEmergencia(idEmergencia);
+                    if (asignacionExitosa) {
+                        System.out.println(GREEN + "Recursos asignados exitosamente a la emergencia con ID: " + idEmergencia + RESET);
                     } else {
-                        System.out.println(YELLOW + "No hay emergencias activas para atender." + RESET);
+                        System.out.println(RED + "No se pudieron asignar recursos a la emergencia con ID: " + idEmergencia + RESET);
                     }
+                    ui.esperarEntradaUsuario();
                     break;
 
                 case 4: // Mostrar Estadísticas del Dia
-                    System.out.print("\033[8;2H"); // Posicionar cursor
-                    System.out.println(YELLOW + "\n--- Estadísticas del Día ---" + RESET);
+                    consola.actualizarConsola(); // Limpiar solo el área de contenido
+                    System.out.println(YELLOW + "--- Estadísticas del Día ---" + RESET);
+                    // Aquí irían las estadísticas reales
+                    ui.esperarEntradaUsuario();
                     break;
 
                 case 5: // Finalizar la jornada y salir
-                    System.out.print("\033[8;2H"); // Posicionar cursor
                     System.out.println(BLUE + "\n--- Finalizar la jornada y salir ---" + RESET);
                     break;
 
                 default:
                     if (opcion != -1) {
-                        System.out.print("\033[8;2H"); // Posicionar cursor
                         System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                     break;
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
         ui.cerrarScanner();

@@ -98,11 +98,7 @@ public class SistemaGestionEmergencia {
 
     // METODO PARA REGISTRAR UNA NUEVA EMERGENCIA
     public void registrarEmergencia(Emergencia emergencia) {
-        if (emergencia != null) {
-            this.emergenciasActivas.add(emergencia);
-            System.out.println(GREEN + "Emergencia Registrada..." + RESET);
-            // Aqui podemos introducir el patron observer, pero lo haremos mas adelante
-        }
+        emergenciasActivas.add(emergencia);
     }
     // Metodos para obtener las listas
 
