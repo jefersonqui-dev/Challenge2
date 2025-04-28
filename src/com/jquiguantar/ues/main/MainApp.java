@@ -51,7 +51,8 @@ public class MainApp {
                         if (asignacionExitosa) {
                             ui.mostrarMensajeExito("Recursos asignados exitosamente a la emergencia ID: " + idSeleccionado);
                         } else {
-                            ui.mostrarMensajeError("No se pudieron asignar recursos a la emergencia con ID: " + idSeleccionado);
+                            System.out.println("\nPresione ENTER para volver al menú principal...");
+                            ui.scanner.nextLine();
                         }
                     } else {
                         ui.mostrarMensajeError("No hay emergencias activas para atender.");
