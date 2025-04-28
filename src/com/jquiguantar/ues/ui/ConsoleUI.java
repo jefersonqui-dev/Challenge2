@@ -90,16 +90,18 @@ public class ConsoleUI {
 
         TipoEmergencia tipoSeleccionado = null;
         while (tipoSeleccionado == null) {
-            System.out.println("Ingrese el numero del tipo: ");
+            System.out.print("Ingrese el numero del tipo: ");
             try {
-                int opcion = Integer.parseInt(scanner.nextLine());
+                int opcion = scanner.nextInt();
+                scanner.nextLine(); // Limpiar el buffer
                 if (opcion > 0 && opcion <= TiposEmergenciaDisponibles.size()) {
                     tipoSeleccionado = TiposEmergenciaDisponibles.get(opcion - 1);
                 } else {
                     System.out.println("Opcion no valida. Intente nuevamente.");
                 }
-            } catch (NumberFormatException e) {
+            } catch (InputMismatchException e) {
                 System.out.println("Opcion no valida. Intente nuevamente.");
+                scanner.nextLine(); // Limpiar el buffer en caso de error
             }
         }
         return tipoSeleccionado;
@@ -190,19 +192,22 @@ public class ConsoleUI {
         System.out.println("\n--- EMERGENCIAS ACTIVAS (" + emergencias.size() + ") ---");
         if (emergencias.isEmpty()) {
             System.out.println("No hay emergencias registradas en este momento.");
+            System.out.println("Presione Enter para continuar...");
+            scanner.nextLine();
+            return;
         } else {
-
+            System.out.println("\nLista de emergencias activas:");
+            System.out.println("----------------------------------------");
             for (Emergencia emergencia : emergencias) {
-                // Muestra los detalles claves de cada Emergencia
-                System.out.println("ID: " + emergencia.getId() +
-                        ", Tipo: " + emergencia.getTipo().getNombre() +
-                        ", Ubicacion: " + emergencia.getUbicacion() +
-                        ", Gravedad: " + emergencia.getNivelGravedad() +
-                        ", Estado: " + emergencia.getEstado() +
-                        ", Recursos Asignados: " + emergencia.getRecursosAsignados().size());
+                System.out.println("ID: " + emergencia.getId());
+                System.out.println("Tipo: " + emergencia.getTipo().getNombre());
+                System.out.println("Ubicacion: " + emergencia.getUbicacion());
+                System.out.println("Gravedad: " + emergencia.getNivelGravedad());
+                System.out.println("Estado: " + emergencia.getEstado());
+                System.out.println("Recursos Asignados: " + emergencia.getRecursosAsignados().size());
+                System.out.println("----------------------------------------");
             }
         }
-        System.out.println("===============================================================\n");
     }
 
     /**
@@ -212,8 +217,15 @@ public class ConsoleUI {
      * @return El ID de la emergencia a atender como String.
      */
     public String solicitarIdEmergenciaAAtender() {
-        System.out.println("Ingrese el ID de la emergencia a atender:");
-        return scanner.nextLine();
+        System.out.println("\nIngrese el ID de la emergencia a atender (o '0' para cancelar):");
+        String id = scanner.nextLine().trim();
+        
+        while (id.isEmpty()) {
+            System.out.println("El ID no puede estar vacío. Por favor ingrese un ID válido:");
+            id = scanner.nextLine().trim();
+        }
+        
+        return id;
     }
     // Mostrar estadisticas...
 

@@ -18,7 +18,11 @@ public class Emergencia {
 
     // Constructor
     public Emergencia(TipoEmergencia tipo, String ubicacion, NivelGravedad nivelGravedad) {
-        this.id = UUID.randomUUID().toString();
+        // Generar un ID más corto y significativo basado en el tipo de emergencia
+        String tipoAbreviado = tipo.getNombre().substring(0, 3).toUpperCase();
+        String numeroSecuencial = String.format("%03d", tipo.getContador());
+        this.id = tipoAbreviado + "-" + numeroSecuencial;
+        
         this.tipo = tipo;
         this.ubicacion = ubicacion;
         this.nivelGravedad = nivelGravedad;

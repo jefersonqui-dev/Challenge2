@@ -5,10 +5,16 @@ import com.jquiguantar.ues.model.resources.TipoRecurso;
 import java.util.HashMap;
 
 public class AccidenteVehicular implements TipoEmergencia {
+    private static int contador = 0;
 
     @Override
     public String getNombre() {
         return "Accidente Vehicular";
+    }
+
+    @Override
+    public int getContador() {
+        return ++contador;
     }
 
     @Override

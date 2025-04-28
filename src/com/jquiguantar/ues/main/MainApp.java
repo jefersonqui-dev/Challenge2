@@ -53,21 +53,27 @@ public class MainApp {
                     // 1. Obtener y Mostrar Emergencias activas
                     List<Emergencia> emergenciasActivas = sistema.getEmergenciasActivas();
                     ui.mostrarEmergenciasActivas(emergenciasActivas);
+                    
                     // 2. Si hay Emergencias activas, solicitar al usuario cual atender
                     if (!emergenciasActivas.isEmpty()) {
                         String idSeleccionado = ui.solicitarIdEmergenciaAAtender();
+                        
+                        // Verificar si el usuario quiere cancelar
+                        if (idSeleccionado.equals("0")) {
+                            System.out.println("Operación cancelada por el usuario.");
+                            break;
+                        }
+                        
                         // 3. Llamar al metodo de asignacion en el Singleton
                         boolean asignacionExitosa = sistema.asignarRecursosAEmergencia(idSeleccionado);
-                        // 4 informar al usuario el resultado
+                        
+                        // 4. informar al usuario el resultado
                         if (asignacionExitosa) {
-                            System.out.println(
-                                    "Recursos asignados exitosamente a la emergencia con ID: " + idSeleccionado);
+                            System.out.println("Recursos asignados exitosamente a la emergencia con ID: " + idSeleccionado);
                         } else {
-                            System.out.println(
-                                    "No se pudieron asignar recursos a la emergencia con ID: " + idSeleccionado);
+                            System.out.println("No se pudieron asignar recursos a la emergencia con ID: " + idSeleccionado + 
+                                             "\nVerifique que el ID sea correcto y que la emergencia no haya sido atendida previamente.");
                         }
-                    } else {
-                        System.out.println("No hay emergencias activas para atender.");
                     }
                     break;
                 case 4: // Mostrar Estadisticas del Dia

@@ -5,10 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Incendio implements TipoEmergencia {
+    private static int contador = 0;
 
     @Override
     public String getNombre() {
         return "Incendio";
+    }
+
+    @Override
+    public int getContador() {
+        return ++contador;
     }
 
     @Override
