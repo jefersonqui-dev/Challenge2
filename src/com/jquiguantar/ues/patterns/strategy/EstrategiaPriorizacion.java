@@ -8,5 +8,13 @@ import java.util.List;
  * Permite implementar diferentes algoritmos de priorización.
  */
 public interface EstrategiaPriorizacion {
+
+    /**
+     * priorizar una lista de emergencias.
+     * 
+     * @param emergencias Lista de emergencias a priorizar.
+     * @return Lista de emergencias priorizadas
+     */
     List<Emergencia> priorizar(List<Emergencia> emergencias);
+
 }
