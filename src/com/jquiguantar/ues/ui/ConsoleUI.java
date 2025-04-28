@@ -22,6 +22,14 @@ public class ConsoleUI {
 
     private List<TipoEmergencia> TiposEmergenciaDisponibles;
 
+    // Constantes de colores que funcionan en la consola
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";      // Color piel
+    public static final String YELLOW = "\u001B[33m";   // Color violeta
+    public static final String GREEN = "\u001B[32m";    // Color verde claro
+    public static final String BLUE = "\u001B[34m";     // Color amarillo
+    public static final String BOLD = "\u001B[1m";      // Negrita
+
     // CONSTRUCTOR
 
     public ConsoleUI() {
@@ -38,16 +46,16 @@ public class ConsoleUI {
      * Muestra el Menu principal de Opciones de Usuario
      */
     public void mostrarMenuPrincipal() {
-        System.out.println("\n===============================================================");
-        System.out.println("            SISTEMA DE GESTION DE EMERGENCIAS URBANAS");
-        System.out.println("=================================================================");
-        System.out.println("Por favor, seleccione una de las siguientes opciones:");
+        System.out.println(BOLD + BLUE + "\n===============================================================" + RESET);
+        System.out.println(BOLD + BLUE + "            SISTEMA DE GESTION DE EMERGENCIAS URBANAS" + RESET);
+        System.out.println(BOLD + BLUE + "=================================================================" + RESET);
+        System.out.println(YELLOW + "Por favor, seleccione una de las siguientes opciones:" + RESET);
         System.out.println("1. Registrar Emergencia");
         System.out.println("2. Ver el Estado Actual de Recursos");
         System.out.println("3. Atender Emergencia");
         System.out.println("4. Mostrar Estadisticas del Dia");
         System.out.println("5. Finalizar la jornada y salir");
-        System.out.println("===============================================================\n");
+        System.out.println(BOLD + BLUE + "===============================================================\n" + RESET);
     }
 
     /**
@@ -59,11 +67,12 @@ public class ConsoleUI {
 
     public int leerOpcion() {
         int opcion = -1;
-        System.out.println("Por favor, ingrese el numero de la opcion deseada: ");
+        System.out.print(YELLOW + "Por favor, ingrese el numero de la opcion deseada: " + RESET);
         try {
-            opcion = scanner.nextInt();
-        } catch (Exception e) {
-            System.out.println("Opcion no valida. Intente nuevamente.");
+            String input = scanner.nextLine();
+            opcion = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            System.out.println(RED + "Opcion no valida. Intente nuevamente." + RESET);
         }
         return opcion;
     }
@@ -82,24 +91,24 @@ public class ConsoleUI {
      * @return El TipoEmergencia seleccionado por el usuario
      */
     public TipoEmergencia solicitarTipoEmergencia() {
-        System.out.println("\n--- Registrar Nueva Emergencia ---");
-        System.out.println("Seleccione el tipo de emergencia: ");
+        System.out.println(YELLOW + "Seleccione el tipo de emergencia: " + RESET);
         for (int i = 0; i < TiposEmergenciaDisponibles.size(); i++) {
             System.out.println((i + 1) + ". " + TiposEmergenciaDisponibles.get(i).getNombre());
         }
 
         TipoEmergencia tipoSeleccionado = null;
         while (tipoSeleccionado == null) {
-            System.out.println("Ingrese el numero del tipo: ");
+            System.out.print(YELLOW + "Ingrese el numero del tipo: " + RESET);
             try {
-                int opcion = Integer.parseInt(scanner.nextLine());
+                String input = scanner.nextLine();
+                int opcion = Integer.parseInt(input);
                 if (opcion > 0 && opcion <= TiposEmergenciaDisponibles.size()) {
                     tipoSeleccionado = TiposEmergenciaDisponibles.get(opcion - 1);
                 } else {
-                    System.out.println("Opcion no valida. Intente nuevamente.");
+                    System.out.println(RED + "Opcion no valida. Intente nuevamente." + RESET);
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Opcion no valida. Intente nuevamente.");
+                System.out.println(RED + "Opcion no valida. Intente nuevamente." + RESET);
             }
         }
         return tipoSeleccionado;
@@ -111,7 +120,7 @@ public class ConsoleUI {
      * @return La ubicacion como String
      */
     public String solicitarUbicacion() {
-        System.out.println("Ingrese la ubicacion de la emergencia: ");
+        System.out.print(YELLOW + "Ingrese la ubicacion de la emergencia: " + RESET);
         return scanner.nextLine();
     }
 
@@ -125,7 +134,7 @@ public class ConsoleUI {
      */
 
     public NivelGravedad solicitarNivelGravedad() {
-        System.out.println("Ingrese el nivel de gravedad de la emergencia: ");
+        System.out.println(YELLOW + "\nNiveles de gravedad disponibles:" + RESET);
         NivelGravedad[] gravedades = NivelGravedad.values();
         for (int i = 0; i < gravedades.length; i++) {
             System.out.println((i + 1) + ". " + gravedades[i]);
@@ -133,46 +142,45 @@ public class ConsoleUI {
 
         NivelGravedad gravedadSeleccionada = null;
         while (gravedadSeleccionada == null) {
-            System.out.println("Ingrese el numero del nivel de gravedad: ");
+            System.out.print(YELLOW + "Ingrese el numero del nivel de gravedad: " + RESET);
             try {
-                int opcion = Integer.parseInt(scanner.nextLine());
+                String input = scanner.nextLine();
+                int opcion = Integer.parseInt(input);
                 if (opcion > 0 && opcion <= gravedades.length) {
                     gravedadSeleccionada = gravedades[opcion - 1];
                 } else {
-                    System.out.println("Opcion no valida. Intente nuevamente.");
+                    System.out.println(RED + "Opcion no valida. Intente nuevamente." + RESET);
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Opcion no valida. Intente nuevamente.");
+                System.out.println(RED + "Opcion no valida. Intente nuevamente." + RESET);
             }
-
         }
         return gravedadSeleccionada;
     }
 
     public void mostrarEstadoRecursos(List<Recursos> disponibles, List<Recursos> ocupados) {
-        System.out.println("\n--- ESTADO ACTUAL DE RECURSOS ---");
+        System.out.println(BOLD + YELLOW + "\n--- ESTADO ACTUAL DE RECURSOS ---" + RESET);
 
-        System.out.println("\n--- Recursos Disponibles (" + disponibles.size() + ") ---");
+        System.out.println(GREEN + "\n--- Recursos Disponibles (" + disponibles.size() + ") ---" + RESET);
         if (disponibles.isEmpty()) {
             System.out.println("No hay recursos disponibles en este momento.");
         } else {
             for (Recursos recurso : disponibles) {
-                // Mustra la informacion basica de cada Recurso
                 System.out.println("ID: " + recurso.getId() + ", Tipo: " + recurso.getTipo() + ", Ubicacion: "
                         + recurso.getUbicacionActual());
             }
         }
-        System.out.println("\n--- Recursos Ocupados (" + ocupados.size() + ") ---");
+
+        System.out.println(RED + "\n--- Recursos Ocupados (" + ocupados.size() + ") ---" + RESET);
         if (ocupados.isEmpty()) {
             System.out.println("No hay recursos ocupados en este momento.");
         } else {
             for (Recursos recurso : ocupados) {
-                // Mustra la informacion basica de cada Recurso
                 System.out.println("ID: " + recurso.getId() + ", Tipo: " + recurso.getTipo() + ", Ubicacion: "
                         + recurso.getUbicacionActual());
             }
         }
-        System.out.println("===============================================================\n");
+        System.out.println(BOLD + BLUE + "===============================================================\n" + RESET);
     }
 
     /**
@@ -187,22 +195,22 @@ public class ConsoleUI {
      */
 
     public void mostrarEmergenciasActivas(List<Emergencia> emergencias) {
-        System.out.println("\n--- EMERGENCIAS ACTIVAS (" + emergencias.size() + ") ---");
+        System.out.println(BOLD + YELLOW + "\n--- EMERGENCIAS ACTIVAS (" + emergencias.size() + ") ---" + RESET);
+        
         if (emergencias.isEmpty()) {
             System.out.println("No hay emergencias registradas en este momento.");
         } else {
-
             for (Emergencia emergencia : emergencias) {
-                // Muestra los detalles claves de cada Emergencia
-                System.out.println("ID: " + emergencia.getId() +
-                        ", Tipo: " + emergencia.getTipo().getNombre() +
-                        ", Ubicacion: " + emergencia.getUbicacion() +
-                        ", Gravedad: " + emergencia.getNivelGravedad() +
-                        ", Estado: " + emergencia.getEstado() +
-                        ", Recursos Asignados: " + emergencia.getRecursosAsignados().size());
+                System.out.println(BOLD + BLUE + "\nEmergencia #" + emergencia.getId() + RESET);
+                System.out.println("Tipo: " + emergencia.getTipo().getNombre());
+                System.out.println("Ubicación: " + emergencia.getUbicacion());
+                System.out.println("Nivel de Gravedad: " + emergencia.getNivelGravedad());
+                System.out.println("Estado: " + emergencia.getEstado());
+                System.out.println("Recursos Asignados: " + emergencia.getRecursosAsignados().size());
+                System.out.println(BOLD + BLUE + "----------------------------------------" + RESET);
             }
         }
-        System.out.println("===============================================================\n");
+        System.out.println(BOLD + BLUE + "===============================================================\n" + RESET);
     }
 
     /**
@@ -212,7 +220,7 @@ public class ConsoleUI {
      * @return El ID de la emergencia a atender como String.
      */
     public String solicitarIdEmergenciaAAtender() {
-        System.out.println("Ingrese el ID de la emergencia a atender:");
+        System.out.println(YELLOW + "Ingrese el ID de la emergencia a atender:" + RESET);
         return scanner.nextLine();
     }
     // Mostrar estadisticas...
