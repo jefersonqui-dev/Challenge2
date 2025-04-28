@@ -58,9 +58,14 @@ public class MainApp {
                         String idSeleccionado = ui.solicitarIdEmergenciaAAtender();
                         // 3. Llamar al metodo de asignacion en el Singleton
                         boolean asignacionExitosa = sistema.asignarRecursosAEmergencia(idSeleccionado);
-                        Emergencia emergenciaSeleccionada = emergenciasActivas.get(idEmergencia - 1);
-                        sistema.atenderEmergencia(emergenciaSeleccionada);
-                        System.out.println("Emergencia atendida con exito...");
+                        // 4 informar al usuario el resultado
+                        if (asignacionExitosa) {
+                            System.out.println(
+                                    "Recursos asignados exitosamente a la emergencia con ID: " + idSeleccionado);
+                        } else {
+                            System.out.println(
+                                    "No se pudieron asignar recursos a la emergencia con ID: " + idSeleccionado);
+                        }
                     } else {
                         System.out.println("No hay emergencias activas para atender.");
                     }
