@@ -1,5 +1,5 @@
 package com.jquiguantar.ues.model.resources;
-
+import com.jquiguantar.ues.utils.Ubicacion;
 /************* ✨ Windsurf Command 🌟 *************/
 /**
  * Representa un recurso para atender emergencias urbanas. Puede ser
@@ -20,10 +20,11 @@ public class Recursos {
 
     private String id; // cada recurso necesita ser identificado de forma unica
     private TipoRecurso tipo;
-    private String ubicacionActual;
+    //private String ubicacionActual;
     private boolean disponible;
+    private Ubicacion ubicacionActual;
 
-    public Recursos(String id, TipoRecurso tipo, String ubicacionActual) {
+    public Recursos(String id, TipoRecurso tipo, Ubicacion ubicacionActual) {
         this.id = id;
         this.tipo = tipo;
         this.ubicacionActual = ubicacionActual;
@@ -39,7 +40,7 @@ public class Recursos {
         return tipo;
     }
 
-    public String getUbicacionActual() {
+    public Ubicacion getUbicacionActual() {
         return ubicacionActual;
     }
 
@@ -56,7 +57,7 @@ public class Recursos {
         this.tipo = tipo;
     }
 
-    public void setUbicacionActual(String ubicacionActual) {
+    public void setUbicacionActual(Ubicacion ubicacionActual) {
         this.ubicacionActual = ubicacionActual;
     }
 
