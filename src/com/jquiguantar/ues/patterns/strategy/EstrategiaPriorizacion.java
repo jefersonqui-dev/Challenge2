@@ -2,6 +2,7 @@ package com.jquiguantar.ues.patterns.strategy;
 
 import com.jquiguantar.ues.model.emergencies.Emergencia;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Interfaz para definir la estrategia de priorización de emergencias.

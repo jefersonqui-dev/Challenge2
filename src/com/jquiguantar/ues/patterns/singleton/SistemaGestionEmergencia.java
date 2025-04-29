@@ -7,6 +7,7 @@ import com.jquiguantar.ues.model.emergencies.Emergencia;
 
 import com.jquiguantar.ues.model.emergencies.EstadoEmergencia;
 import com.jquiguantar.ues.model.resources.TipoRecurso;
+import com.jquiguantar.ues.patterns.observer.ObservadorEmergencia;
 import com.jquiguantar.ues.patterns.strategy.EstrategiaPriorizacion;
 import com.jquiguantar.ues.patterns.strategy.PrioridadPorGravedad;
 import com.jquiguantar.ues.services.GestionEmergencia;
@@ -76,6 +77,8 @@ public class SistemaGestionEmergencia {
     // Nuevo atributo : Estrategia de priorizacion actual
     private EstrategiaPriorizacion estrategiaPriorizacionActual;
 
+    private List<ObservadorEmergencia> observadores; // Lista de observadores
+
     // constructor privado para garantizar la unica instancia
     // Nadie fuera de esta clase puede usar 'New SistemaGestionEmergencia()'
     private SistemaGestionEmergencia() {
@@ -94,10 +97,14 @@ public class SistemaGestionEmergencia {
         // Inicializa la estrategia de priorización por defecto
         this.estrategiaPriorizacionActual = new PrioridadPorGravedad();
 
+        this.observadores = new ArrayList<>(); // Inicializa la lista de observadores
+
         // LLama a un metodo de inicializacion de recursos
         inicializarRecursos();
         System.out.println(BOLD + BLUE + "Sistema de Emergencias Urbanas Inicializado..." + RESET);
 
+        // Registrar observadores(creamos uno a continuacion)
+        agregarObservador(new com.jquiguantar.ues.patterns.observer.ConsoleNotificationObserver());
     }
 
     /**
