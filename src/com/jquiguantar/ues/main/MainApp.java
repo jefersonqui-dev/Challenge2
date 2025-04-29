@@ -7,6 +7,7 @@ import com.jquiguantar.ues.model.resources.Recursos;
 import com.jquiguantar.ues.model.emergencies.Emergencia;
 import com.jquiguantar.ues.model.emergencies.TipoEmergencia;
 import com.jquiguantar.ues.model.emergencies.NivelGravedad;
+import com.jquiguantar.ues.patterns.factory.EmergenciaFactory;
 
 public class MainApp {
     public static void main(String[] args) {
@@ -29,8 +30,8 @@ public class MainApp {
                     String ubicacion = ui.solicitarUbicacion();
                     NivelGravedad gravedad = ui.solicitarNivelGravedad();
 
-                    Emergencia emergencia = new Emergencia(tipo, ubicacion, gravedad);
-                    sistema.registrarEmergencia(emergencia);
+                    Emergencia nuevaEmergencia = EmergenciaFactory.crearEmergencia(tipo, ubicacion, gravedad);
+                    sistema.registrarEmergencia(nuevaEmergencia);
                     ui.mostrarMensajeExito("Emergencia registrada exitosamente");
                     break;
 

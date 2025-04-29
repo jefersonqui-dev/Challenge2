@@ -7,6 +7,9 @@ import com.jquiguantar.ues.model.emergencies.Emergencia;
 
 import com.jquiguantar.ues.model.emergencies.EstadoEmergencia;
 import com.jquiguantar.ues.model.resources.TipoRecurso;
+import com.jquiguantar.ues.patterns.observer.ObservadorEmergencia;
+import com.jquiguantar.ues.patterns.strategy.EstrategiaPriorizacion;
+import com.jquiguantar.ues.patterns.strategy.PrioridadPorGravedad;
 import com.jquiguantar.ues.services.GestionEmergencia;
 
 import com.jquiguantar.ues.model.resources.Recursos;
@@ -22,11 +25,11 @@ import java.util.stream.Collectors;//Necesario para usar lambdas con streams
 public class SistemaGestionEmergencia {
     // Constantes de colores que funcionan en la consola
     public static final String RESET = "\u001B[0m";
-    public static final String RED = "\u001B[31m";      // Color piel
-    public static final String YELLOW = "\u001B[33m";   // Color violeta
-    public static final String GREEN = "\u001B[32m";    // Color verde claro
-    public static final String BLUE = "\u001B[34m";     // Color amarillo
-    public static final String BOLD = "\u001B[1m";      // Negrita
+    public static final String RED = "\u001B[31m"; // Color piel
+    public static final String YELLOW = "\u001B[33m"; // Color violeta
+    public static final String GREEN = "\u001B[32m"; // Color verde claro
+    public static final String BLUE = "\u001B[34m"; // Color amarillo
+    public static final String BOLD = "\u001B[1m"; // Negrita
 
     // Constantes para tiempos de espera (en milisegundos)
     private static final int TIEMPO_BUSQUEDA = 1500;
@@ -35,8 +38,9 @@ public class SistemaGestionEmergencia {
 
     /**
      * Simula un tiempo de espera con puntos de progreso
+     * 
      * @param tiempoEspera Tiempo total de espera en milisegundos
-     * @param mensaje Mensaje a mostrar durante la espera
+     * @param mensaje      Mensaje a mostrar durante la espera
      */
     private void simularProcesamiento(int tiempoEspera, String mensaje) {
         System.out.print(mensaje);
@@ -70,6 +74,11 @@ public class SistemaGestionEmergencia {
     private List<Recursos> recursosOcupados; // RECURSO OCUPADO
     private List<GestionEmergencia> serviciosOperacionales; // SERVICIO DE GESTION DE EMERGENCIA
 
+    // Nuevo atributo : Estrategia de priorizacion actual
+    private EstrategiaPriorizacion estrategiaPriorizacionActual;
+
+    private List<ObservadorEmergencia> observadores; // Lista de observadores
+
     // constructor privado para garantizar la unica instancia
     // Nadie fuera de esta clase puede usar 'New SistemaGestionEmergencia()'
     private SistemaGestionEmergencia() {
@@ -78,16 +87,24 @@ public class SistemaGestionEmergencia {
         this.emergenciasResueltas = new ArrayList<>();
         this.recursosDisponibles = new ArrayList<>();
         this.recursosOcupados = new ArrayList<>();
+
         // Inicializa los servicios
         this.serviciosOperacionales = new ArrayList<>();
         this.serviciosOperacionales.add(new AmbulanciaService());
         this.serviciosOperacionales.add(new BomberoService());
         this.serviciosOperacionales.add(new PoliciaService());
 
+        // Inicializa la estrategia de priorización por defecto
+        this.estrategiaPriorizacionActual = new PrioridadPorGravedad();
+
+        this.observadores = new ArrayList<>(); // Inicializa la lista de observadores
+
         // LLama a un metodo de inicializacion de recursos
         inicializarRecursos();
         System.out.println(BOLD + BLUE + "Sistema de Emergencias Urbanas Inicializado..." + RESET);
 
+        // Registrar observadores(creamos uno a continuacion)
+        agregarObservador(new com.jquiguantar.ues.patterns.observer.ConsoleNotificationObserver());
     }
 
     /**
@@ -102,6 +119,40 @@ public class SistemaGestionEmergencia {
         }
         // Devuelve la instancia creada
         return instance;
+    }
+
+    // METODOS PARA GESTION DE OBSERVADORES
+    /**
+     * Agrega un observador a la lista de observadores.
+     * @param obs El observador a agregar.
+     */
+    public void agregarObservador(ObservadorEmergencia obs) {
+        if (obs != null && !this.observadores.contains(obs)) {
+            this.observadores.add(obs);
+        }
+    }
+    /**
+     * Elimina un observador de la lista de observadores.
+     * @param obs El observador a eliminar.
+     */
+    public void removerObservador(ObservadorEmergencia obs) {
+        if (obs != null) {
+            this.observadores.remove(obs);
+        }
+    }
+    
+    /**
+     * Notifica a todos los observadores registrados sobre una emergencia.
+     * Este metodo es llamado internamente cuando ocurre un evento relevante.
+     * @param emergencia La emergencia sobre la que se notifica.
+     */
+    public void notificarObservadores(Emergencia emergencia) {
+        System.out.println(BOLD + BLUE + "Notificando observadores sobre emergencia ID: " + emergencia.getId() + RESET);
+
+        for (ObservadorEmergencia obs : this.observadores) {
+            obs.actualizar(emergencia);//llama al metodo actualizar de cada observador
+        }
+        System.out.println(BOLD + BLUE + "Notificación completada." + RESET);
     }
 
     // --- METODOS PARA GESTIONAR EL ESTADO DEL SISTEMA ---
@@ -124,16 +175,26 @@ public class SistemaGestionEmergencia {
     }
 
     // METODO PARA REGISTRAR UNA NUEVA EMERGENCIA
+    /**
+     * Registra una nueva emergencia en el sistema.
+     * @param emergencia La emergencia a registrar.
+     */
     public void registrarEmergencia(Emergencia emergencia) {
         if (emergencia != null) {
             this.emergenciasActivas.add(emergencia);
-            // Aqui podemos introducir el patron observer, pero lo haremos mas adelante
+            System.out.println(GREEN + 
+            "Emergencia registrada con ID: " + emergencia.getId() + 
+            " (" + emergencia.getTipo().getNombre() + 
+            "en " + emergencia.getUbicacion() + 
+            ", Gravedad: " + emergencia.getNivelGravedad() + ")" + RESET);
+            //Aqui disparamos la notificacion a los observadores
+            notificarObservadores(emergencia);
         }
     }
     // Metodos para obtener las listas
 
     public List<Emergencia> getEmergenciasActivas() {
-        return emergenciasActivas;
+        return estrategiaPriorizacionActual.priorizar(this.emergenciasActivas);
     }
 
     public List<Recursos> getRecursosDisponibles() {
@@ -148,6 +209,14 @@ public class SistemaGestionEmergencia {
         return serviciosOperacionales;
     }
 
+    // Metodo para cambiar la estrategia de priorizacion
+    public void setEstrategiaPriorizacion(EstrategiaPriorizacion estrategia) {
+        if (estrategia != null) {
+            this.estrategiaPriorizacionActual = estrategia;
+            System.out.println("Estrategia de priorizacion cambiada a: " + estrategia.getClass().getSimpleName());
+        }
+    }
+
     // METODO PARA ASIGNAR RECURSOS
     public boolean asignarRecursosAEmergencia(String idEmergencia) {
         System.out.println(BOLD + BLUE + "\n--- INICIO ASIGNACIÓN DE RECURSOS --- ID: " + idEmergencia + RESET);
@@ -160,8 +229,8 @@ public class SistemaGestionEmergencia {
             return false;
         }
         // Mostrar detalles solo si es válida
-        System.out.println(GREEN + "  Emergencia válida: " + emergencia.getTipo().getNombre() + 
-                         " (" + emergencia.getNivelGravedad() + ")" + RESET);
+        System.out.println(GREEN + "  Emergencia válida: " + emergencia.getTipo().getNombre() +
+                " (" + emergencia.getNivelGravedad() + ")" + RESET);
 
         // 2. Obtener recursos necesarios
         simularProcesamiento(TIEMPO_PROCESAMIENTO, YELLOW + "  Calculando recursos necesarios" + RESET);
@@ -177,11 +246,11 @@ public class SistemaGestionEmergencia {
         if (asignacionExitosa) {
             simularProcesamiento(TIEMPO_ASIGNACION, YELLOW + "  Actualizando estado de la emergencia" + RESET);
             emergencia.setEstado(EstadoEmergencia.EN_PROGRESO);
-            System.out.println(GREEN + "  Recursos asignados. Emergencia ID " + emergencia.getId() + 
-                             " ahora está " + emergencia.getEstado() + RESET);
+            System.out.println(GREEN + "  Recursos asignados. Emergencia ID " + emergencia.getId() +
+                    " ahora está " + emergencia.getEstado() + RESET);
         } else {
-            System.out.println(RED + "  Recursos insuficientes para atender completamente la emergencia ID " + 
-                            emergencia.getId() + RESET);
+            System.out.println(RED + "  Recursos insuficientes para atender completamente la emergencia ID " +
+                    emergencia.getId() + RESET);
         }
         System.out.println(BOLD + BLUE + "--- Fin del Proceso de Asignación --- " + RESET);
 
@@ -190,6 +259,7 @@ public class SistemaGestionEmergencia {
 
     /**
      * Valida y busca una emergencia por su ID. Imprime error si no es válida.
+     * 
      * @param idEmergencia ID de la emergencia a buscar
      * @return La emergencia encontrada o null si no es válida
      */
@@ -200,16 +270,16 @@ public class SistemaGestionEmergencia {
                 .findFirst();
 
         if (!emergenciaOpt.isPresent()) {
-            System.out.println(RED + "  Error: Emergencia con ID: " + idEmergencia + 
-                            " no encontrada." + RESET);
+            System.out.println(RED + "  Error: Emergencia con ID: " + idEmergencia +
+                    " no encontrada." + RESET);
             return null;
         }
 
         Emergencia emergencia = emergenciaOpt.get();
         if (emergencia.getEstado() != EstadoEmergencia.PENDIENTE) {
-            System.out.println(RED + "  Error: Emergencia con ID: " + idEmergencia + 
-                            " no está PENDIENTE. Estado actual: " + 
-                            emergencia.getEstado() + RESET);
+            System.out.println(RED + "  Error: Emergencia con ID: " + idEmergencia +
+                    " no está PENDIENTE. Estado actual: " +
+                    emergencia.getEstado() + RESET);
             return null;
         }
         // Si es válida, no imprimimos nada aquí, solo devolvemos el objeto
@@ -218,19 +288,20 @@ public class SistemaGestionEmergencia {
 
     /**
      * Asigna recursos por tipo a una emergencia
-     * @param emergencia Emergencia a la que asignar recursos
+     * 
+     * @param emergencia         Emergencia a la que asignar recursos
      * @param recursosNecesarios Mapa de tipos de recursos y cantidades necesarias
      * @return true si se asignaron recursos exitosamente (al menos uno)
      */
-    private boolean asignarRecursosPorTipo(Emergencia emergencia, 
-                                         Map<TipoRecurso, Integer> recursosNecesarios) {
+    private boolean asignarRecursosPorTipo(Emergencia emergencia,
+            Map<TipoRecurso, Integer> recursosNecesarios) {
         boolean asignacionGeneralExitosa = false;
         boolean recursosSuficientes = true;
 
         for (Map.Entry<TipoRecurso, Integer> entry : recursosNecesarios.entrySet()) {
             TipoRecurso tipoNecesario = entry.getKey();
             int cantidadNecesaria = entry.getValue();
-            
+
             System.out.println(YELLOW + "\n  Tipo: " + tipoNecesario + " | Necesarios: " + cantidadNecesaria + RESET);
 
             // Obtener recursos disponibles del tipo requerido
@@ -242,9 +313,9 @@ public class SistemaGestionEmergencia {
 
             // Asignar recursos disponibles
             simularProcesamiento(TIEMPO_ASIGNACION, YELLOW + "    Intentando asignar" + RESET);
-            int cantidadAsignada = asignarRecursosDisponibles(emergencia, 
-                                                            recursosDisponiblesDelTipo, 
-                                                            cantidadNecesaria);
+            int cantidadAsignada = asignarRecursosDisponibles(emergencia,
+                    recursosDisponiblesDelTipo,
+                    cantidadNecesaria);
 
             if (cantidadAsignada > 0) {
                 System.out.println(GREEN + "    Asignados: " + cantidadAsignada + RESET);
@@ -259,21 +330,23 @@ public class SistemaGestionEmergencia {
             }
         }
         // Devolvemos true solo si se asignaron TODOS los recursos necesarios
-        // O podrías cambiarlo a devolver asignacionGeneralExitosa si quieres que EN_PROGRESO
+        // O podrías cambiarlo a devolver asignacionGeneralExitosa si quieres que
+        // EN_PROGRESO
         // se active con asignación parcial.
-        return asignacionGeneralExitosa && recursosSuficientes; 
+        return asignacionGeneralExitosa && recursosSuficientes;
     }
 
     /**
      * Asigna recursos disponibles a una emergencia (sin mensajes de consola)
-     * @param emergencia Emergencia a la que asignar recursos
+     * 
+     * @param emergencia          Emergencia a la que asignar recursos
      * @param recursosDisponibles Lista de recursos disponibles
-     * @param cantidadNecesaria Cantidad de recursos necesarios
+     * @param cantidadNecesaria   Cantidad de recursos necesarios
      * @return Cantidad de recursos asignados
      */
-    private int asignarRecursosDisponibles(Emergencia emergencia, 
-                                         List<Recursos> recursosDisponibles, 
-                                         int cantidadNecesaria) {
+    private int asignarRecursosDisponibles(Emergencia emergencia,
+            List<Recursos> recursosDisponibles,
+            int cantidadNecesaria) {
         int cantidadAsignada = 0;
 
         // Tomar solo los necesarios o los disponibles, lo que sea menor
@@ -286,7 +359,7 @@ public class SistemaGestionEmergencia {
             this.recursosDisponibles.remove(recurso);
             this.recursosOcupados.add(recurso);
             recurso.setDisponible(false);
-            
+
             // Asignar recurso a la emergencia
             emergencia.agregarRecursoAsignado(recurso);
             cantidadAsignada++;
