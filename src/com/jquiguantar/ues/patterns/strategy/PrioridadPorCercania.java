@@ -4,7 +4,7 @@ import com.jquiguantar.ues.utils.Ubicacion;
 import com.jquiguantar.ues.utils.MapaUrbano;
 import java.util.List;
 import java.util.Comparator;   
-import java.util.Collections;
+// import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 

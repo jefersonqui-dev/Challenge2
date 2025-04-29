@@ -68,7 +68,7 @@ public class MainApp {
                     break;
 
                 case 5: // Finalizar la jornada y salir
-                    System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "\nFinalizando la jornada..." + ConsoleUI.RESET);
+                    System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "\nFinalizando la jornada. Generando Estadisticas Finales..." + ConsoleUI.RESET);
                     sistema.resolverEmergenciasEnProgreso();
                     sistema.generarEstadisticas();
                     break;

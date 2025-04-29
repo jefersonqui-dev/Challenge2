@@ -29,8 +29,8 @@ import java.util.stream.Collectors;//Necesario para usar lambdas con streams
 import com.jquiguantar.ues.utils.Ubicacion;
 import com.jquiguantar.ues.utils.MapaUrbano;
 import java.util.Comparator;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+//import java.time.LocalDateTime;
+//import java.time.temporal.ChronoUnit;
 
 
 public class SistemaGestionEmergencia {
@@ -55,14 +55,14 @@ public class SistemaGestionEmergencia {
      */
     private void simularProcesamiento(int tiempoEspera, String mensaje) {
         System.out.print(mensaje);
-        int puntos = 0;
+        //int puntos = 0;
         int intervalo = tiempoEspera / 4; // Dividir el tiempo en 4 partes
 
         try {
             for (int i = 0; i < 4; i++) {
                 Thread.sleep(intervalo);
                 System.out.print(".");
-                puntos++;
+                //puntos++;
             }
             System.out.println("- ");
         } catch (InterruptedException e) {
