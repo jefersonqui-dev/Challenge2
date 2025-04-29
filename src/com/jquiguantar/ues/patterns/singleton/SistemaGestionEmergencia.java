@@ -104,7 +104,7 @@ public class SistemaGestionEmergencia {
         System.out.println(BOLD + BLUE + "Sistema de Emergencias Urbanas Inicializado..." + RESET);
 
         // Registrar observadores(creamos uno a continuacion)
-        agregarObservador(new com.jquiguantar.ues.patterns.observer.ConsoleNotificationObserver());
+        //agregarObservador(new com.jquiguantar.ues.patterns.observer.ConsoleNotificationObserver());
     }
 
     /**
@@ -119,6 +119,40 @@ public class SistemaGestionEmergencia {
         }
         // Devuelve la instancia creada
         return instance;
+    }
+
+    // METODOS PARA GESTION DE OBSERVADORES
+    /**
+     * Agrega un observador a la lista de observadores.
+     * @param obs El observador a agregar.
+     */
+    public void agregarObservador(ObservadorEmergencia obs) {
+        if (obs != null && !this.observadores.contains(obs)) {
+            this.observadores.add(obs);
+        }
+    }
+    /**
+     * Elimina un observador de la lista de observadores.
+     * @param obs El observador a eliminar.
+     */
+    public void removerObservador(ObservadorEmergencia obs) {
+        if (obs != null) {
+            this.observadores.remove(obs);
+        }
+    }
+    
+    /**
+     * Notifica a todos los observadores registrados sobre una emergencia.
+     * Este metodo es llamado internamente cuando ocurre un evento relevante.
+     * @param emergencia La emergencia sobre la que se notifica.
+     */
+    public void notificarObservadores(Emergencia emergencia) {
+        System.out.println(BOLD + BLUE + "Notificando observadores sobre emergencia ID: " + emergencia.getId() + RESET);
+
+        for (ObservadorEmergencia obs : this.observadores) {
+            obs.actualizar(emergencia);//llama al metodo actualizar de cada observador
+        }
+        System.out.println(BOLD + BLUE + "Notificación completada." + RESET);
     }
 
     // --- METODOS PARA GESTIONAR EL ESTADO DEL SISTEMA ---
@@ -141,10 +175,21 @@ public class SistemaGestionEmergencia {
     }
 
     // METODO PARA REGISTRAR UNA NUEVA EMERGENCIA
+    /**
+     * Registra una nueva emergencia en el sistema.
+     * @param emergencia La emergencia a registrar.
+     */
+    @Override
     public void registrarEmergencia(Emergencia emergencia) {
         if (emergencia != null) {
             this.emergenciasActivas.add(emergencia);
-            // Aqui podemos introducir el patron observer, pero lo haremos mas adelante
+            System.out.println(GREEN + 
+            "Emergencia registrada con ID: " + emergencia.getId() + 
+            " (" + emergencia.getTipo().getNombre() + 
+            "en " + emergencia.getUbicacion() + 
+            ", Gravedad: " + emergencia.getNivelGravedad() + ")" + RESET);
+            //Aqui disparamos la notificacion a los observadores
+            notificarObservadores(emergencia);
         }
     }
     // Metodos para obtener las listas
