@@ -8,14 +8,14 @@ import com.jquiguantar.ues.model.emergencies.Emergencia;
 import com.jquiguantar.ues.model.emergencies.Incendio;
 import com.jquiguantar.ues.model.emergencies.Robo;
 import com.jquiguantar.ues.model.resources.Recursos;
-import com.jquiguantar.ues.model.resources.TipoRecurso;
-import com.jquiguantar.ues.model.emergencies.EstadoEmergencia;
-import java.util.InputMismatchException;
+// import com.jquiguantar.ues.model.resources.TipoRecurso;
+// import com.jquiguantar.ues.model.emergencies.EstadoEmergencia;
+// import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
-
-// Clase para manejar la interaccion con el usuario a traves de consola
+import com.jquiguantar.ues.utils.Ubicacion;
+// Clase para manejar la interaccion con el usuario a triaves de consola
 
 public class ConsoleUI {
     public Scanner scanner;
@@ -133,15 +133,29 @@ public class ConsoleUI {
         }
         return tipoSeleccionado;
     }
+    private int leerCoordenada(String mensaje) {
+        int coordenada = Integer.MIN_VALUE;
+        while (coordenada == Integer.MIN_VALUE) {
+            System.out.print(mensaje);
+            try {   
+                coordenada = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println(RED + "Entrada no válida. Por favor, ingrese un número entero." + RESET);
+            }
+        }
+        return coordenada;
+    }
 
     /**
-     * Solicita al usuario que ingrese la ubicacion de la emergencia
-     * 
-     * @return La ubicacion como String
+     * Solicita al usuario la ubucacion de la emergencia (coordenadas)
+     * @return Un objeto Ubicacion con las coordenadas ingresadas
      */
-    public String solicitarUbicacion() {
-        System.out.print(YELLOW + "\nIngrese la ubicación de la emergencia: " + RESET);
-        return scanner.nextLine();
+    public Ubicacion solicitarUbicacion() {
+        System.out.println("Ingrese la ubicacion de la emergencia (coordenadas X  Y): ");
+        //llama a los metodos auxiliares para solicitar las coordenadas
+        int x = leerCoordenada("X");
+        int y = leerCoordenada("Y");
+        return new Ubicacion(x, y);
     }
 
     /**

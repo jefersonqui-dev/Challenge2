@@ -7,6 +7,7 @@ package com.jquiguantar.ues.patterns.factory;
 import com.jquiguantar.ues.model.emergencies.Emergencia;
 import com.jquiguantar.ues.model.emergencies.TipoEmergencia;
 import com.jquiguantar.ues.model.emergencies.NivelGravedad;
+import com.jquiguantar.ues.utils.Ubicacion;
 
 /**
  * Fabrica para crear instancias de Emergencia
@@ -29,7 +30,7 @@ public class EmergenciaFactory {
      * @param gravedad  Nivel de Gravedad de la Emergencia
      * @return Nueva instancia de Emergencia creada
      */
-    public static Emergencia crearEmergencia(TipoEmergencia tipo, String ubicacion, NivelGravedad gravedad) {
+    public static Emergencia crearEmergencia(TipoEmergencia tipo, Ubicacion ubicacion, NivelGravedad gravedad) {
         // La logica de creacion se centraliza aqui
         // Por ahora es solo llamar al constructor privado de Emergencia
 

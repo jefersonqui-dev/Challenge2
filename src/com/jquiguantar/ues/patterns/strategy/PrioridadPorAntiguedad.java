@@ -4,7 +4,7 @@ import com.jquiguantar.ues.model.emergencies.Emergencia;
 import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 //Esta estrategia ordenara las emergencias por su tiempo de inicio, las mas antiguas primero
@@ -24,4 +24,5 @@ public class PrioridadPorAntiguedad implements EstrategiaPriorizacion {
          * .collect(Collectors.toList());
          */
         return listaPriorizada;
+    }
 }

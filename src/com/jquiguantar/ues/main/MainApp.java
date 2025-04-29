@@ -8,6 +8,7 @@ import com.jquiguantar.ues.model.emergencies.Emergencia;
 import com.jquiguantar.ues.model.emergencies.TipoEmergencia;
 import com.jquiguantar.ues.model.emergencies.NivelGravedad;
 import com.jquiguantar.ues.patterns.factory.EmergenciaFactory;
+import com.jquiguantar.ues.utils.Ubicacion;
 
 public class MainApp {
     public static void main(String[] args) {
@@ -27,7 +28,7 @@ public class MainApp {
             switch (opcion) {
                 case 1: // Registrar Emergencia
                     TipoEmergencia tipo = ui.solicitarTipoEmergencia();
-                    String ubicacion = ui.solicitarUbicacion();
+                    Ubicacion ubicacion = ui.solicitarUbicacion();
                     NivelGravedad gravedad = ui.solicitarNivelGravedad();
 
                     Emergencia nuevaEmergencia = EmergenciaFactory.crearEmergencia(tipo, ubicacion, gravedad);
@@ -62,11 +63,14 @@ public class MainApp {
 
                 case 4: // Mostrar Estadísticas del Día
                     System.out.println(ConsoleUI.YELLOW + "\n--- Estadísticas del Día ---" + ConsoleUI.RESET);
-                    ui.mostrarMensajeExito("Estadísticas mostradas correctamente");
+                    sistema.resolverEmergenciasEnProgreso();
+                    sistema.generarEstadisticas();
                     break;
 
                 case 5: // Finalizar la jornada y salir
                     System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "\nFinalizando la jornada..." + ConsoleUI.RESET);
+                    sistema.resolverEmergenciasEnProgreso();
+                    sistema.generarEstadisticas();
                     break;
 
                 default:

@@ -22,5 +22,20 @@ public class Ubicacion {
     public String toString(){
         return "(" + x + ", " + y + ")";
     }
-    
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ubicacion ubicacion = (Ubicacion) o;
+        return x == ubicacion.x && y == ubicacion.y;
+    }
+    @Override
+    public int hashCode()
+    {
+        int result = x;
+        result = 31 * result + y;
+        return result;  
+    }
+
 }
