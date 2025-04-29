@@ -104,7 +104,7 @@ public class SistemaGestionEmergencia {
         System.out.println(BOLD + BLUE + "Sistema de Emergencias Urbanas Inicializado..." + RESET);
 
         // Registrar observadores(creamos uno a continuacion)
-        //agregarObservador(new com.jquiguantar.ues.patterns.observer.ConsoleNotificationObserver());
+        agregarObservador(new com.jquiguantar.ues.patterns.observer.ConsoleNotificationObserver());
     }
 
     /**
@@ -179,7 +179,6 @@ public class SistemaGestionEmergencia {
      * Registra una nueva emergencia en el sistema.
      * @param emergencia La emergencia a registrar.
      */
-    @Override
     public void registrarEmergencia(Emergencia emergencia) {
         if (emergencia != null) {
             this.emergenciasActivas.add(emergencia);
