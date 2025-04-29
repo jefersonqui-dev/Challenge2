@@ -5,19 +5,21 @@ import java.time.LocalDateTime; //Para la fecha y hora
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import com.jquiguantar.ues.utils.Ubicacion;
 
 public class Emergencia {
     private String id;
     private TipoEmergencia tipo;
-    private String ubicacion;
+    //private String ubicacion;
     private NivelGravedad nivelGravedad;
     private EstadoEmergencia estado;
     private LocalDateTime tiempoInicio;
     private LocalDateTime tiempoFin;
     private List<Recursos> recursosAsignados;
+    private Ubicacion ubicacion;
 
     // Constructor
-    public Emergencia(TipoEmergencia tipo, String ubicacion, NivelGravedad nivelGravedad) {
+    public Emergencia(TipoEmergencia tipo, Ubicacion ubicacion, NivelGravedad nivelGravedad) {
         this.id = UUID.randomUUID().toString();
         this.tipo = tipo;
         this.ubicacion = ubicacion;
@@ -37,7 +39,7 @@ public class Emergencia {
         return tipo;
     }
 
-    public String getUbicacion() {
+    public Ubicacion getUbicacion() {
         return ubicacion;
     }
 
