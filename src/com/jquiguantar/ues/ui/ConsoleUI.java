@@ -15,13 +15,22 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
 import com.jquiguantar.ues.utils.Ubicacion;
+// Importar Estrategias y Singleton
+import com.jquiguantar.ues.patterns.singleton.SistemaGestionEmergencia;
+import com.jquiguantar.ues.patterns.strategy.EstrategiaPriorizacion;
+import com.jquiguantar.ues.patterns.strategy.PrioridadPorAntiguedad;
+import com.jquiguantar.ues.patterns.strategy.PrioridadPorCercania;
+import com.jquiguantar.ues.patterns.strategy.PrioridadPorGravedad;
+
 import java.io.IOException;
+import java.util.Map;
 // Clase para manejar la interaccion con el usuario a triaves de consola
 
 public class ConsoleUI {
     public Scanner scanner;
 
     private List<TipoEmergencia> TiposEmergenciaDisponibles;
+    private List<EstrategiaPriorizacion> estrategiasDisponibles; // Lista de estrategias
 
     // Constantes de colores que funcionan en la consola
     public static final String RESET = "\u001B[0m";
@@ -41,6 +50,14 @@ public class ConsoleUI {
         this.TiposEmergenciaDisponibles.add(new Incendio());
         this.TiposEmergenciaDisponibles.add(new AccidenteVehicular());
         this.TiposEmergenciaDisponibles.add(new Robo());
+
+        // Inicializa la lista de estrategias disponibles
+        this.estrategiasDisponibles = new ArrayList<>();
+        this.estrategiasDisponibles.add(new PrioridadPorGravedad());
+        // Para cercanía, usamos un punto de referencia por defecto (0,0)
+        // Se podría hacer más configurable si fuera necesario
+        this.estrategiasDisponibles.add(new PrioridadPorCercania(new Ubicacion(0, 0)));
+        this.estrategiasDisponibles.add(new PrioridadPorAntiguedad());
     }
 
     public void limpiarConsola() {
@@ -67,14 +84,23 @@ public class ConsoleUI {
      */
     public void mostrarMenuPrincipal() {
         limpiarConsola();
+        SistemaGestionEmergencia sge = SistemaGestionEmergencia.getInstance(); // Obtener instancia
+        String estrategiaActual = sge.getEstrategiaPriorizacionActual() != null ?
+                                   sge.getEstrategiaPriorizacionActual().getClass().getSimpleName() :
+                                   "No definida";
+
         System.out.println(BOLD + BLUE + "===============================================" + RESET);
         System.out.println(BOLD + BLUE + "    SISTEMA DE GESTIÓN DE EMERGENCIAS URBANAS" + RESET);
         System.out.println(BOLD + BLUE + "===============================================" + RESET);
+        System.out.println("Estrategia Actual: " + BOLD + YELLOW + estrategiaActual + RESET); // Mostrar estrategia actual
+        System.out.println(BOLD + BLUE + "-----------------------------------------------" + RESET);
         System.out.println("1. Registrar Emergencia");
         System.out.println("2. Ver Estado de Recursos");
-        System.out.println("3. Atender Emergencia");
-        System.out.println("4. Estadísticas del Día");
-        System.out.println("5. Salir");
+        System.out.println("3. Atender Siguiente Emergencia (Automático)"); // Modificado
+        System.out.println("4. Resolver Emergencias en Progreso (Simulación)"); //Añadido o renombrar si existe
+        System.out.println("5. Cambiar Estrategia de Priorización"); // Nueva opción
+        System.out.println("6. Estadísticas del Día"); // Renumerado
+        System.out.println("7. Salir"); // Renumerado
         System.out.println(BOLD + BLUE + "===============================================" + RESET);
     }
 
@@ -257,42 +283,73 @@ public class ConsoleUI {
      * Si no hay emergencias activas, indica que no hay emergencias registradas
      * en el momento.
      * 
-     * @param emergencias La lista de emergencias activas a mostrar.
+     * La lista se muestra priorizada según la estrategia actual.
+     * 
+     * @param emergencias La lista de emergencias activas (ya priorizada) a mostrar.
      */
 
-    public void mostrarEmergenciasActivas(List<Emergencia> emergencias) {
+    public void mostrarEmergenciasActivas(List<Emergencia> emergencias) { // Recibe lista ya priorizada
         limpiarConsola();
-        System.out.println(BOLD + YELLOW + "EMERGENCIAS ACTIVAS" + RESET);
-        System.out.println(BOLD + YELLOW + "-------------------" + RESET);
-
+        System.out.println(BOLD + YELLOW + "EMERGENCIAS ACTIVAS (Priorizadas)" + RESET);
+        System.out.println(BOLD + YELLOW + "---------------------------------" + RESET);
+        
         if (emergencias.isEmpty()) {
             System.out.println("No hay emergencias activas en este momento.");
         } else {
             for (Emergencia emergencia : emergencias) {
-                System.out.println("\nID: " + emergencia.getId());
-                System.out.println("Tipo: " + emergencia.getTipo().getNombre());
-                System.out.println("Ubicación: " + emergencia.getUbicacion());
-                System.out.println("Gravedad: " + emergencia.getNivelGravedad());
-                System.out.println("Estado: " + emergencia.getEstado());
-                System.out.println("Recursos Asignados: " + emergencia.getRecursosAsignados().size());
-                System.out.println("-------------------");
+                 // Solo mostramos las PENDIENTES o EN_PROGRESO aquí
+                if (emergencia.getEstado() == com.jquiguantar.ues.model.emergencies.EstadoEmergencia.PENDIENTE ||
+                    emergencia.getEstado() == com.jquiguantar.ues.model.emergencies.EstadoEmergencia.EN_PROGRESO) {
+
+                    System.out.println("\nID: " + emergencia.getId());
+                    System.out.println("Tipo: " + emergencia.getTipo().getNombre());
+                    System.out.println("Ubicación: " + emergencia.getUbicacion());
+                    System.out.println("Gravedad: " + emergencia.getNivelGravedad());
+                    System.out.println("Estado: " + emergencia.getEstado());
+                    System.out.println("Recursos Asignados: " + emergencia.getRecursosAsignados().size());
+                    System.out.println("Registrada: " + emergencia.getTiempoInicio().format(java.time.format.DateTimeFormatter.ISO_LOCAL_TIME));
+                    System.out.println("-------------------");
+                }
             }
         }
+        // Añadimos pausa al final si es necesario
+        // System.out.println("
+        System.out.println("Presione ENTER para continuar...");
+        scanner.nextLine();
     }
 
     /**
-     * Solicita al usuario que ingrese el ID de una emergencia activa
-     * para atender.
-     * 
-     * @return El ID de la emergencia a atender como String.
+     * Muestra las estrategias de priorización disponibles y permite al usuario seleccionar una.
+     * Actualiza la estrategia en SistemaGestionEmergencia.
      */
-    public String solicitarIdEmergenciaAAtender() {
-        System.out.print(YELLOW + "Ingrese el ID de la emergencia a atender: " + RESET);
-        return scanner.nextLine();
+    public void seleccionarEstrategiaPriorizacion() {
+        limpiarConsola();
+        System.out.println(BOLD + YELLOW + "CAMBIAR ESTRATEGIA DE PRIORIZACIÓN" + RESET);
+        System.out.println(BOLD + YELLOW + "---------------------------------" + RESET);
+        System.out.println("Seleccione la nueva estrategia:");
+
+        for (int i = 0; i < estrategiasDisponibles.size(); i++) {
+            // Usamos getClass().getSimpleName() para un nombre legible
+            System.out.println((i + 1) + ". " + estrategiasDisponibles.get(i).getClass().getSimpleName());
+        }
+
+        int opcionSeleccionada = leerEnteroValidado(
+                YELLOW + "\nIngrese el número de la estrategia: " + RESET,
+                "Opción no válida. Intente nuevamente.",
+                (opcion) -> opcion > 0 && opcion <= estrategiasDisponibles.size()
+        );
+
+        // Obtener la instancia de la estrategia seleccionada de nuestra lista
+        EstrategiaPriorizacion nuevaEstrategia = estrategiasDisponibles.get(opcionSeleccionada - 1);
+
+        // Actualizar la estrategia en el Singleton
+        SistemaGestionEmergencia.getInstance().setEstrategiaPriorizacion(nuevaEstrategia);
+
+        mostrarMensajeExito("Estrategia de priorización actualizada a: " + nuevaEstrategia.getClass().getSimpleName());
     }
 
     public void mostrarMensajeExito(String mensaje) {
-        System.out.println(GREEN + mensaje + RESET);
+        System.out.println(GREEN + "\n✓ " + mensaje + RESET); // Añadido icono ✓
         System.out.println("\nPresione ENTER para continuar...");
         scanner.nextLine();
     }
@@ -303,6 +360,33 @@ public class ConsoleUI {
         scanner.nextLine();
     }
 
-    // Mostrar estadisticas...
+    // Método para mostrar estadísticas
+    public void mostrarEstadisticas(int totalEmergencias, Map<TipoEmergencia, Integer> atendidasPorTipo, Map<TipoEmergencia, Long> tiempoTotalPorTipo) {
+        limpiarConsola();
+        System.out.println(BOLD + BLUE + "\n--- REPORTE DE ESTADÍSTICAS ---" + RESET);
+        System.out.println(YELLOW + "Total de emergencias atendidas (Resueltas): " + totalEmergencias + RESET);
+
+        // Estadisticas por tipo de emergencia
+        if (atendidasPorTipo != null && !atendidasPorTipo.isEmpty()) {
+            System.out.println(YELLOW + "\n--- Estadísticas por tipo de emergencia ---" + RESET);
+            // Usar un conjunto de tipos presentes en las estadísticas para iterar
+            for (TipoEmergencia tipo : atendidasPorTipo.keySet()) {
+                int atendidas = atendidasPorTipo.getOrDefault(tipo, 0);
+                long tiempoTotal = tiempoTotalPorTipo.getOrDefault(tipo, 0L);
+                long tiempoPromedioMs = (atendidas > 0) ? tiempoTotal / atendidas : 0;
+                double tiempoPromedioSeg = tiempoPromedioMs / 1000.0;
+
+                System.out.println(YELLOW + "   - " + tipo.getNombre() + ":" + RESET);
+                System.out.println(YELLOW + "     Atendidas: " + atendidas + RESET);
+                System.out.println(YELLOW + "     Tiempo Promedio Respuesta: " + tiempoPromedioMs + " ms (" +
+                                   String.format("%.2f", tiempoPromedioSeg) + " segundos)" + RESET);
+            }
+        } else {
+            System.out.println(YELLOW + "No hay emergencias resueltas aún para mostrar estadísticas por tipo." + RESET);
+        }
+        System.out.println(); // Línea en blanco para separar
+        System.out.print(YELLOW + "Presione ENTER para volver al menú principal..." + RESET); 
+        scanner.nextLine(); // Esperar que el usuario presione Enter
+    }
 
 }

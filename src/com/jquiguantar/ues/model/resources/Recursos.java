@@ -1,6 +1,8 @@
 package com.jquiguantar.ues.model.resources;
 import com.jquiguantar.ues.utils.Ubicacion;
-/************* ✨ Windsurf Command 🌟 *************/
+import com.jquiguantar.ues.interfaces.Responder;
+import com.jquiguantar.ues.model.emergencies.Emergencia;
+/************* ✨ Windsurf Command �� *************/
 /**
  * Representa un recurso para atender emergencias urbanas. Puede ser
  * un vehiculo de bomberos, una ambulancia, un policia, un bombero,
@@ -16,7 +18,7 @@ import com.jquiguantar.ues.utils.Ubicacion;
  * a esos datos desde fuera de la clase. esto establece la base para todos
  * los tipos especificos de recursos que crearemos despues usando HERENCIA
  */
-public class Recursos {
+public class Recursos implements Responder {
 
     private String id; // cada recurso necesita ser identificado de forma unica
     private TipoRecurso tipo;
@@ -44,6 +46,7 @@ public class Recursos {
         return ubicacionActual;
     }
 
+    @Override
     public boolean isDisponible() {
         return disponible;
     }
@@ -63,6 +66,12 @@ public class Recursos {
 
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
+    }
+
+    @Override
+    public void atenderEmergencia(Emergencia emergencia) {
+        System.out.println("Recurso " + this.id + " atendiendo emergencia " + emergencia.getId());
+        this.setDisponible(false);
     }
 
 }

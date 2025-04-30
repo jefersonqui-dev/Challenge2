@@ -22,7 +22,7 @@ public class MainApp {
         SistemaGestionEmergencia sistema = SistemaGestionEmergencia.getInstance();
         int opcion = 0;
 
-        while (opcion != 5) {
+        while (opcion != 7) {
             ui.mostrarMenuPrincipal();
             opcion = ui.leerOpcion();
             switch (opcion) {
@@ -33,7 +33,7 @@ public class MainApp {
 
                     Emergencia nuevaEmergencia = EmergenciaFactory.crearEmergencia(tipo, ubicacion, gravedad);
                     sistema.registrarEmergencia(nuevaEmergencia);
-                    ui.mostrarMensajeExito("Emergencia registrada exitosamente");
+                    ui.mostrarMensajeExito("Emergencia registrada exitosamente con ID: " + nuevaEmergencia.getId());
                     break;
 
                 case 2: // Ver el Estado Actual de Recursos
@@ -42,38 +42,49 @@ public class MainApp {
                     ui.mostrarEstadoRecursos(recursosDisponibles, recursosOcupados);
                     break;
 
-                case 3: // Atender Emergencia
-                    List<Emergencia> emergenciasActivas = sistema.getEmergenciasActivas();
-                    ui.mostrarEmergenciasActivas(emergenciasActivas);
+                case 3: // Atender Siguiente Emergencia (Automático)
+                    List<Emergencia> emergenciasActivasAntes = sistema.getEmergenciasActivas();
+                    ui.mostrarEmergenciasActivas(emergenciasActivasAntes);
+                    System.out.println("\nPresione ENTER para intentar atender la más prioritaria...");
+                    ui.scanner.nextLine();
                     
-                    if (!emergenciasActivas.isEmpty()) {
-                        String idSeleccionado = ui.solicitarIdEmergenciaAAtender();
-                        boolean asignacionExitosa = sistema.asignarRecursosAEmergencia(idSeleccionado);
-                        
-                        if (asignacionExitosa) {
-                            ui.mostrarMensajeExito("Recursos asignados exitosamente a la emergencia ID: " + idSeleccionado);
-                        } else {
-                            System.out.println("\nPresione ENTER para volver al menú principal...");
-                            ui.scanner.nextLine();
-                        }
+                    boolean seIntentoAtender = sistema.atenderSiguienteEmergenciaPrioritaria();
+                    
+                    if (!seIntentoAtender) {
+                        ui.mostrarMensajeError("No se pudo iniciar la atención (ver detalles arriba).");
                     } else {
-                        ui.mostrarMensajeError("No hay emergencias activas para atender.");
+                        System.out.println("\nPresione ENTER para volver al menú principal...");
+                        ui.scanner.nextLine();
                     }
                     break;
 
-                case 4: // Mostrar Estadísticas del Día
-                    System.out.println(ConsoleUI.YELLOW + "\n--- Estadísticas del Día ---" + ConsoleUI.RESET);
+                case 4: // Resolver Emergencias en Progreso (Simulación)
+                    System.out.println(ConsoleUI.YELLOW + "\nSimulando resolución de emergencias..." + ConsoleUI.RESET);
                     sistema.resolverEmergenciasEnProgreso();
-                    sistema.generarEstadisticas();
-                    
-                    System.out.println("\nPresione ENTER para continuar...");
-                    ui.scanner.nextLine();
+                    ui.mostrarMensajeExito("Simulación de resolución completada.");
+                    break;
+                
+                case 5: // Cambiar Estrategia de Priorización
+                    ui.seleccionarEstrategiaPriorizacion();
                     break;
 
-                case 5: // Finalizar la jornada y salir
+                case 6: // Mostrar Estadísticas del Día (ahora usa el método de UI)
+                    ui.mostrarEstadisticas(
+                        sistema.getTotalEmergenciasAtendidas(), 
+                        sistema.getEmergenciasAtendidasPorTipo(), 
+                        sistema.getTiempoTotalRespuestaPorTipoMilis()
+                    );
+                    break;
+
+                case 7: // Finalizar la jornada y salir
                     System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "\nFinalizando la jornada. Generando Estadisticas Finales..." + ConsoleUI.RESET);
                     sistema.resolverEmergenciasEnProgreso();
-                    sistema.generarEstadisticas();
+                    ui.mostrarEstadisticas(
+                        sistema.getTotalEmergenciasAtendidas(), 
+                        sistema.getEmergenciasAtendidasPorTipo(), 
+                        sistema.getTiempoTotalRespuestaPorTipoMilis()
+                    );
+                    System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "Saliendo del sistema..." + ConsoleUI.RESET);
                     break;
 
                 default:

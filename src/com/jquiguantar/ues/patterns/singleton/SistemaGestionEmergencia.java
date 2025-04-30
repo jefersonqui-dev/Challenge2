@@ -205,6 +205,9 @@ public class SistemaGestionEmergencia {
         recursosDisponibles.add(new com.jquiguantar.ues.model.resources.Patrulla("UP002", new Ubicacion(10, 90)));
         recursosDisponibles.add(new com.jquiguantar.ues.model.resources.Patrulla("UP003", new Ubicacion(10, 90)));
         recursosDisponibles.add(new com.jquiguantar.ues.model.resources.Patrulla("UP004", new Ubicacion(10, 90)));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.PoliciasPersonal("POLP001", new Ubicacion(12, 34)));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.ParamedicosPersonal("PARAP001", new Ubicacion(12, 34)));
+// ... añade mas ...
         
         // System.out.println("Recursos Inicializados...");
     }
@@ -251,6 +254,57 @@ public class SistemaGestionEmergencia {
             System.out.println( GREEN + "Estrategia de priorizacion cambiada a: " + estrategia.getClass().getSimpleName() + RESET);
 
         }
+    }
+
+    // Getter para la estrategia actual (necesario para la UI)
+    public EstrategiaPriorizacion getEstrategiaPriorizacionActual() {
+        return estrategiaPriorizacionActual;
+    }
+
+    /**
+     * Intenta atender la siguiente emergencia prioritaria según la estrategia actual.
+     * Obtiene la emergencia más prioritaria que esté PENDIENTE y llama a 
+     * asignarRecursosAEmergencia para ella.
+     * 
+     * @return true si se encontró y se intentó asignar recursos a una emergencia prioritaria,
+     *         false si no había emergencias pendientes o falló la asignación inicial.
+     */
+    public boolean atenderSiguienteEmergenciaPrioritaria() {
+        System.out.println(BOLD + YELLOW + "\n--- INTENTANDO ATENDER EMERGENCIA PRIORITARIA (Automático) ---" + RESET);
+        System.out.println(YELLOW + "Estrategia actual: " + (estrategiaPriorizacionActual != null ? estrategiaPriorizacionActual.getClass().getSimpleName() : "No definida") + RESET);
+
+        // 1. Filtrar emergencias PENDIENTES
+        List<Emergencia> pendientes = this.emergenciasActivas.stream()
+                                        .filter(e -> e.getEstado() == EstadoEmergencia.PENDIENTE)
+                                        .collect(Collectors.toList());
+
+        if (pendientes.isEmpty()) {
+            System.out.println(RED + "No hay emergencias PENDIENTES para atender." + RESET);
+            System.out.println(BOLD + YELLOW + "--- FIN ATENCIÓN AUTOMÁTICA ---" + RESET);
+            return false;
+        }
+
+        // 2. Priorizar las pendientes usando la estrategia actual
+        List<Emergencia> priorizadas = estrategiaPriorizacionActual.priorizar(pendientes);
+
+        if (priorizadas.isEmpty()) {
+            // Esto no debería ocurrir si 'pendientes' no estaba vacía, pero por seguridad
+            System.out.println(RED + "La estrategia no devolvió ninguna emergencia priorizada." + RESET);
+            System.out.println(BOLD + YELLOW + "--- FIN ATENCIÓN AUTOMÁTICA ---" + RESET);
+            return false;
+        }
+
+        // 3. Tomar la más prioritaria (la primera de la lista)
+        Emergencia emergenciaPrioritaria = priorizadas.get(0);
+        System.out.println(GREEN + "Emergencia más prioritaria seleccionada (ID: " + emergenciaPrioritaria.getId() + "): " +
+                           emergenciaPrioritaria.getTipo().getNombre() + " en " + emergenciaPrioritaria.getUbicacion() + 
+                           " (Gravedad: " + emergenciaPrioritaria.getNivelGravedad() + ")" + RESET);
+
+        // 4. Intentar asignar recursos a esta emergencia
+        boolean exitoAsignacion = asignarRecursosAEmergencia(emergenciaPrioritaria.getId());
+
+        System.out.println(BOLD + YELLOW + "--- FIN ATENCIÓN AUTOMÁTICA ---" + RESET);
+        return exitoAsignacion; // Devuelve si la asignación fue (al menos parcialmente) exitosa
     }
 
     // METODO PARA ASIGNAR RECURSOS
@@ -513,4 +567,21 @@ public class SistemaGestionEmergencia {
         System.out.println(YELLOW + "Recursos Ocupados: " + recursosOcupados.size() + RESET);
         System.out.println(BOLD + BLUE + "--------------------------------------" + RESET);
     }
+
+    // --- Getters para Estadísticas (necesarios para UI) ---
+
+    public int getTotalEmergenciasAtendidas() {
+        return totalEmergenciasAtendidas;
+    }
+
+    public Map<TipoEmergencia, Integer> getEmergenciasAtendidasPorTipo() {
+        // Devolvemos una copia para evitar modificaciones externas
+        return new HashMap<>(emergenciasAtendidasPorTipo);
+    }
+
+    public Map<TipoEmergencia, Long> getTiempoTotalRespuestaPorTipoMilis() {
+        // Devolvemos una copia para evitar modificaciones externas
+        return new HashMap<>(tiempoTotalRespuestaPorTipoMilis);
+    }
+
 }
