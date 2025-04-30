@@ -25,11 +25,11 @@ public class ConsoleUI {
 
     // Constantes de colores que funcionan en la consola
     public static final String RESET = "\u001B[0m";
-    public static final String RED = "\u001B[31m";      // Color piel
-    public static final String YELLOW = "\u001B[33m";   // Color violeta
-    public static final String GREEN = "\u001B[32m";    // Color verde claro
-    public static final String BLUE = "\u001B[34m";     // Color amarillo
-    public static final String BOLD = "\u001B[1m";      // Negrita
+    public static final String RED = "\u001B[31m"; // Color piel
+    public static final String YELLOW = "\u001B[33m"; // Color violeta
+    public static final String GREEN = "\u001B[32m"; // Color verde claro
+    public static final String BLUE = "\u001B[34m"; // Color amarillo
+    public static final String BOLD = "\u001B[1m"; // Negrita
 
     // CONSTRUCTOR
 
@@ -54,9 +54,10 @@ public class ConsoleUI {
         } catch (IOException | InterruptedException e) {
             // Si falla la limpieza, simplemente imprimimos líneas en blanco
             // for (int i = 0; i < 50; i++) {
-            //     System.out.println();
+            // System.out.println();
             // }
-            //Si falla (ej: no es un entorno de consola real), simplemente ignorar o imprimir un mensaje
+            // Si falla (ej: no es un entorno de consola real), simplemente ignorar o
+            // imprimir un mensaje
             System.out.println("No se pudo limpiar la consola.");
         }
     }
@@ -86,13 +87,14 @@ public class ConsoleUI {
 
     public int leerOpcion() {
         // Se utiliza el método auxiliar para leer y validar la opción.
-        // El predicado `(opcion) -> true` significa que cualquier entero es aceptado por ahora,
-        // la validación específica del rango de opciones se hace en el bucle principal de la aplicación.
+        // El predicado `(opcion) -> true` significa que cualquier entero es aceptado
+        // por ahora,
+        // la validación específica del rango de opciones se hace en el bucle principal
+        // de la aplicación.
         return leerEnteroValidado(
-                YELLOW + "Por favor, ingrese el número de la opción deseada: " + RESET, 
-                "Opción no válida.", 
-                (opcion) -> true 
-            ); 
+                YELLOW + "Por favor, ingrese el número de la opción deseada: " + RESET,
+                "Opción no válida.",
+                (opcion) -> true);
     }
 
     public void cerrarScanner() {
@@ -113,17 +115,17 @@ public class ConsoleUI {
         System.out.println(BOLD + YELLOW + "REGISTRAR NUEVA EMERGENCIA" + RESET);
         System.out.println(BOLD + YELLOW + "--------------------------" + RESET);
         System.out.println("Seleccione el tipo de emergencia:");
-        
+
         for (int i = 0; i < TiposEmergenciaDisponibles.size(); i++) {
             System.out.println((i + 1) + ". " + TiposEmergenciaDisponibles.get(i).getNombre());
         }
 
-        // Usamos el método auxiliar para leer la opción, validando que esté en el rango correcto.
+        // Usamos el método auxiliar para leer la opción, validando que esté en el rango
+        // correcto.
         int opcionSeleccionada = leerEnteroValidado(
-            YELLOW + "\nIngrese el número del tipo: " + RESET,
-            "Opción no válida. Intente nuevamente.",
-            (opcion) -> opcion > 0 && opcion <= TiposEmergenciaDisponibles.size()
-        );
+                YELLOW + "\nIngrese el número del tipo: " + RESET,
+                "Opción no válida. Intente nuevamente.",
+                (opcion) -> opcion > 0 && opcion <= TiposEmergenciaDisponibles.size());
 
         return TiposEmergenciaDisponibles.get(opcionSeleccionada - 1);
     }
@@ -137,19 +139,19 @@ public class ConsoleUI {
     private int leerCoordenada(String mensaje) {
         // Utiliza leerEnteroValidado aceptando cualquier entero.
         return leerEnteroValidado(
-                mensaje, 
-                "Entrada no válida.", 
-                (coord) -> true
-            );
+                mensaje,
+                "Entrada no válida.",
+                (coord) -> true);
     }
 
     /**
      * Solicita al usuario la ubucacion de la emergencia (coordenadas)
+     * 
      * @return Un objeto Ubicacion con las coordenadas ingresadas
      */
     public Ubicacion solicitarUbicacion() {
         System.out.println("Ingrese la ubicacion de la emergencia (coordenadas X  Y): ");
-        //llama a los metodos auxiliares para solicitar las coordenadas
+        // llama a los metodos auxiliares para solicitar las coordenadas
         int x = leerCoordenada("X: ");
         int y = leerCoordenada("Y: ");
         return new Ubicacion(x, y);
@@ -167,32 +169,37 @@ public class ConsoleUI {
     public NivelGravedad solicitarNivelGravedad() {
         System.out.println(BOLD + YELLOW + "\nNIVEL DE GRAVEDAD" + RESET);
         System.out.println(BOLD + YELLOW + "-----------------" + RESET);
-        
+
         NivelGravedad[] gravedades = NivelGravedad.values();
         for (int i = 0; i < gravedades.length; i++) {
             System.out.println((i + 1) + ". " + gravedades[i]);
         }
 
-        // Usamos el método auxiliar para leer la opción, validando que esté en el rango correcto.
+        // Usamos el método auxiliar para leer la opción, validando que esté en el rango
+        // correcto.
         int opcionSeleccionada = leerEnteroValidado(
-            YELLOW + "\nIngrese el número del nivel de gravedad: " + RESET,
-            "Opción no válida. Intente nuevamente.",
-            (opcion) -> opcion > 0 && opcion <= gravedades.length
-        );
+                YELLOW + "\nIngrese el número del nivel de gravedad: " + RESET,
+                "Opción no válida. Intente nuevamente.",
+                (opcion) -> opcion > 0 && opcion <= gravedades.length);
 
         return gravedades[opcionSeleccionada - 1];
     }
 
     /**
      * Lee un entero desde la consola, validando la entrada.
-     * Repite la solicitud hasta que se ingrese un entero válido que cumpla con el criterio de validación.
+     * Repite la solicitud hasta que se ingrese un entero válido que cumpla con el
+     * criterio de validación.
      *
-     * @param mensajePrompt El mensaje a mostrar al usuario para solicitar la entrada.
-     * @param mensajeError El mensaje de error a mostrar si la entrada no es un número o no es válida.
-     * @param validador Una función lambda (Predicate) que define el criterio de validez del número ingresado.
+     * @param mensajePrompt El mensaje a mostrar al usuario para solicitar la
+     *                      entrada.
+     * @param mensajeError  El mensaje de error a mostrar si la entrada no es un
+     *                      número o no es válida.
+     * @param validador     Una función lambda (Predicate) que define el criterio de
+     *                      validez del número ingresado.
      * @return El número entero validado.
      */
-    private int leerEnteroValidado(String mensajePrompt, String mensajeError, java.util.function.Predicate<Integer> validador) {
+    private int leerEnteroValidado(String mensajePrompt, String mensajeError,
+            java.util.function.Predicate<Integer> validador) {
         int valor = Integer.MIN_VALUE;
         boolean valido = false;
         while (!valido) {
@@ -216,26 +223,26 @@ public class ConsoleUI {
         limpiarConsola();
         System.out.println(BOLD + YELLOW + "ESTADO DE RECURSOS" + RESET);
         System.out.println(BOLD + YELLOW + "------------------" + RESET);
-        
+
         System.out.println(GREEN + "\nRecursos Disponibles (" + disponibles.size() + "):" + RESET);
         if (disponibles.isEmpty()) {
             System.out.println("No hay recursos disponibles en este momento.");
         } else {
             for (Recursos recurso : disponibles) {
-                System.out.println("- ID: " + recurso.getId() + 
-                                 " | Tipo: " + recurso.getTipo() + 
-                                 " | Ubicación: " + recurso.getUbicacionActual());
+                System.out.println("- ID: " + recurso.getId() +
+                        " | Tipo: " + recurso.getTipo() +
+                        " | Ubicación: " + recurso.getUbicacionActual());
             }
         }
-        
+
         System.out.println(RED + "\nRecursos Ocupados (" + ocupados.size() + "):" + RESET);
         if (ocupados.isEmpty()) {
             System.out.println("No hay recursos ocupados en este momento.");
         } else {
             for (Recursos recurso : ocupados) {
-                System.out.println("- ID: " + recurso.getId() + 
-                                 " | Tipo: " + recurso.getTipo() + 
-                                 " | Ubicación: " + recurso.getUbicacionActual());
+                System.out.println("- ID: " + recurso.getId() +
+                        " | Tipo: " + recurso.getTipo() +
+                        " | Ubicación: " + recurso.getUbicacionActual());
             }
         }
         System.out.println("\nPresione ENTER para volver al menú principal...");
@@ -257,7 +264,7 @@ public class ConsoleUI {
         limpiarConsola();
         System.out.println(BOLD + YELLOW + "EMERGENCIAS ACTIVAS" + RESET);
         System.out.println(BOLD + YELLOW + "-------------------" + RESET);
-        
+
         if (emergencias.isEmpty()) {
             System.out.println("No hay emergencias activas en este momento.");
         } else {
@@ -285,7 +292,7 @@ public class ConsoleUI {
     }
 
     public void mostrarMensajeExito(String mensaje) {
-        System.out.println(GREEN   + mensaje + RESET);
+        System.out.println(GREEN + mensaje + RESET);
         System.out.println("\nPresione ENTER para continuar...");
         scanner.nextLine();
     }
