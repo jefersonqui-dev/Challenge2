@@ -8,6 +8,9 @@ import java.util.UUID;
 import com.jquiguantar.ues.utils.Ubicacion;
 
 public class Emergencia {
+    // Contador estático para generar IDs secuenciales
+    private static long contadorId = 0;
+
     private String id;
     private TipoEmergencia tipo;
     //private String ubicacion;
@@ -20,7 +23,9 @@ public class Emergencia {
 
     // Constructor
     public Emergencia(TipoEmergencia tipo, Ubicacion ubicacion, NivelGravedad nivelGravedad) {
-        this.id = UUID.randomUUID().toString();
+        // Generar ID secuencial con prefijo
+        contadorId++;
+        this.id = "EMG-" + contadorId;
         this.tipo = tipo;
         this.ubicacion = ubicacion;
         this.nivelGravedad = nivelGravedad;
