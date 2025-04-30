@@ -51,11 +51,9 @@ public class ConsoleUI {
         this.TiposEmergenciaDisponibles.add(new AccidenteVehicular());
         this.TiposEmergenciaDisponibles.add(new Robo());
 
-        // Inicializa la lista de estrategias disponibles
+        // Inicializa la lista de estrategias disponibles (se mantiene por si se usa internamente)
         this.estrategiasDisponibles = new ArrayList<>();
         this.estrategiasDisponibles.add(new PrioridadPorGravedad());
-        // Para cercanía, usamos un punto de referencia por defecto (0,0)
-        // Se podría hacer más configurable si fuera necesario
         this.estrategiasDisponibles.add(new PrioridadPorCercania(new Ubicacion(0, 0)));
         this.estrategiasDisponibles.add(new PrioridadPorAntiguedad());
     }
@@ -69,38 +67,24 @@ public class ConsoleUI {
                 System.out.flush();
             }
         } catch (IOException | InterruptedException e) {
-            // Si falla la limpieza, simplemente imprimimos líneas en blanco
-            // for (int i = 0; i < 50; i++) {
-            // System.out.println();
-            // }
-            // Si falla (ej: no es un entorno de consola real), simplemente ignorar o
-            // imprimir un mensaje
             System.out.println("No se pudo limpiar la consola.");
         }
     }
 
     /**
-     * Muestra el Menu principal de Opciones de Usuario
+     * Muestra el Menu principal de Opciones de Usuario (Versión 5 opciones)
      */
     public void mostrarMenuPrincipal() {
         limpiarConsola();
-        SistemaGestionEmergencia sge = SistemaGestionEmergencia.getInstance(); // Obtener instancia
-        String estrategiaActual = sge.getEstrategiaPriorizacionActual() != null ?
-                                   sge.getEstrategiaPriorizacionActual().getClass().getSimpleName() :
-                                   "No definida";
-
+        // Ya no mostramos la estrategia actual aquí
         System.out.println(BOLD + BLUE + "===============================================" + RESET);
         System.out.println(BOLD + BLUE + "    SISTEMA DE GESTIÓN DE EMERGENCIAS URBANAS" + RESET);
         System.out.println(BOLD + BLUE + "===============================================" + RESET);
-        System.out.println("Estrategia Actual: " + BOLD + YELLOW + estrategiaActual + RESET); // Mostrar estrategia actual
-        System.out.println(BOLD + BLUE + "-----------------------------------------------" + RESET);
         System.out.println("1. Registrar Emergencia");
         System.out.println("2. Ver Estado de Recursos");
-        System.out.println("3. Atender Siguiente Emergencia (Automático)"); // Modificado
-        System.out.println("4. Resolver Emergencias en Progreso (Simulación)"); //Añadido o renombrar si existe
-        System.out.println("5. Cambiar Estrategia de Priorización"); // Nueva opción
-        System.out.println("6. Estadísticas del Día"); // Renumerado
-        System.out.println("7. Salir"); // Renumerado
+        System.out.println("3. Atender Emergencia (Automático por Prioridad)"); // Descripción ajustada
+        System.out.println("4. Estadísticas del Día");
+        System.out.println("5. Finalizar Programa"); // Opción 5 es salir
         System.out.println(BOLD + BLUE + "===============================================" + RESET);
     }
 
@@ -321,6 +305,7 @@ public class ConsoleUI {
     /**
      * Muestra las estrategias de priorización disponibles y permite al usuario seleccionar una.
      * Actualiza la estrategia en SistemaGestionEmergencia.
+     * (Actualmente no se llama desde el menú principal)
      */
     public void seleccionarEstrategiaPriorizacion() {
         limpiarConsola();
@@ -329,8 +314,18 @@ public class ConsoleUI {
         System.out.println("Seleccione la nueva estrategia:");
 
         for (int i = 0; i < estrategiasDisponibles.size(); i++) {
-            // Usamos getClass().getSimpleName() para un nombre legible
-            System.out.println((i + 1) + ". " + estrategiasDisponibles.get(i).getClass().getSimpleName());
+            String nombreEstrategia = "Desconocida";
+            // Intentamos obtener un nombre más descriptivo si existe un método
+            // (Asumiendo que EstrategiaPriorizacion podría tener un getName() o similar en el futuro,
+            // por ahora usamos el nombre de la clase)
+            try {
+                // Ejemplo: si tuvieras un método getNombre() en la interfaz/clases
+                // nombreEstrategia = estrategiasDisponibles.get(i).getNombre(); 
+                 nombreEstrategia = estrategiasDisponibles.get(i).getClass().getSimpleName();
+            } catch (Exception e) {
+                 nombreEstrategia = estrategiasDisponibles.get(i).getClass().getSimpleName();
+            }
+            System.out.println((i + 1) + ". " + nombreEstrategia);
         }
 
         int opcionSeleccionada = leerEnteroValidado(
@@ -339,12 +334,8 @@ public class ConsoleUI {
                 (opcion) -> opcion > 0 && opcion <= estrategiasDisponibles.size()
         );
 
-        // Obtener la instancia de la estrategia seleccionada de nuestra lista
         EstrategiaPriorizacion nuevaEstrategia = estrategiasDisponibles.get(opcionSeleccionada - 1);
-
-        // Actualizar la estrategia en el Singleton
         SistemaGestionEmergencia.getInstance().setEstrategiaPriorizacion(nuevaEstrategia);
-
         mostrarMensajeExito("Estrategia de priorización actualizada a: " + nuevaEstrategia.getClass().getSimpleName());
     }
 

@@ -22,7 +22,7 @@ public class MainApp {
         SistemaGestionEmergencia sistema = SistemaGestionEmergencia.getInstance();
         int opcion = 0;
 
-        while (opcion != 7) {
+        while (opcion != 5) {
             ui.mostrarMenuPrincipal();
             opcion = ui.leerOpcion();
             switch (opcion) {
@@ -42,33 +42,25 @@ public class MainApp {
                     ui.mostrarEstadoRecursos(recursosDisponibles, recursosOcupados);
                     break;
 
-                case 3: // Atender Siguiente Emergencia (Automático)
-                    List<Emergencia> emergenciasActivasAntes = sistema.getEmergenciasActivas();
-                    ui.mostrarEmergenciasActivas(emergenciasActivasAntes);
-                    System.out.println("\nPresione ENTER para intentar atender la más prioritaria...");
-                    ui.scanner.nextLine();
-                    
-                    boolean seIntentoAtender = sistema.atenderSiguienteEmergenciaPrioritaria();
-                    
-                    if (!seIntentoAtender) {
-                        ui.mostrarMensajeError("No se pudo iniciar la atención (ver detalles arriba).");
-                    } else {
-                        System.out.println("\nPresione ENTER para volver al menú principal...");
+                case 3: // Atender Emergencia (Automático por Prioridad)
+                    List<Emergencia> emergenciasActivas = sistema.getEmergenciasActivas();
+                    ui.mostrarEmergenciasActivas(emergenciasActivas);
+                    if (emergenciasActivas.stream().anyMatch(e -> e.getEstado() == com.jquiguantar.ues.model.emergencies.EstadoEmergencia.PENDIENTE)) {
+                        System.out.println("\nPresione ENTER para intentar atender la emergencia más prioritaria (la primera de la lista)..." + ConsoleUI.RESET);
                         ui.scanner.nextLine();
+                        boolean seIntentoAtender = sistema.atenderSiguienteEmergenciaPrioritaria();
+                        if (!seIntentoAtender) {
+                            ui.mostrarMensajeError("No se pudo iniciar la atención.");
+                        } else {
+                            System.out.println("\nPresione ENTER para volver al menú...");
+                            ui.scanner.nextLine();
+                        }
+                    } else {
+                        ui.mostrarMensajeError("No hay emergencias PENDIENTES para atender.");
                     }
                     break;
 
-                case 4: // Resolver Emergencias en Progreso (Simulación)
-                    System.out.println(ConsoleUI.YELLOW + "\nSimulando resolución de emergencias..." + ConsoleUI.RESET);
-                    sistema.resolverEmergenciasEnProgreso();
-                    ui.mostrarMensajeExito("Simulación de resolución completada.");
-                    break;
-                
-                case 5: // Cambiar Estrategia de Priorización
-                    ui.seleccionarEstrategiaPriorizacion();
-                    break;
-
-                case 6: // Mostrar Estadísticas del Día (ahora usa el método de UI)
+                case 4: // Mostrar Estadísticas del Día
                     ui.mostrarEstadisticas(
                         sistema.getTotalEmergenciasAtendidas(), 
                         sistema.getEmergenciasAtendidasPorTipo(), 
@@ -76,21 +68,22 @@ public class MainApp {
                     );
                     break;
 
-                case 7: // Finalizar la jornada y salir
-                    System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "\nFinalizando la jornada. Generando Estadisticas Finales..." + ConsoleUI.RESET);
+                case 5: // Finalizar Programa
+                    System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "\nFinalizando la jornada..." + ConsoleUI.RESET);
+                    System.out.println(ConsoleUI.YELLOW + "Resolviendo emergencias pendientes/en progreso (simulación)..." + ConsoleUI.RESET);
                     sistema.resolverEmergenciasEnProgreso();
+                    System.out.println(ConsoleUI.YELLOW + "Generando estadísticas finales..." + ConsoleUI.RESET);
                     ui.mostrarEstadisticas(
                         sistema.getTotalEmergenciasAtendidas(), 
                         sistema.getEmergenciasAtendidasPorTipo(), 
                         sistema.getTiempoTotalRespuestaPorTipoMilis()
                     );
-                    System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "Saliendo del sistema..." + ConsoleUI.RESET);
+                    System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "Guardando registros (simulado)..." + ConsoleUI.RESET);
+                    System.out.println(ConsoleUI.BOLD + ConsoleUI.BLUE + "Saliendo del sistema." + ConsoleUI.RESET);
                     break;
 
                 default:
-                    if (opcion != -1) {
-                        ui.mostrarMensajeError("Opción no válida. Intente nuevamente.");
-                    }
+                    ui.mostrarMensajeError("Opción no válida. Intente nuevamente.");
                     break;
             }
         }
