@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
 import com.jquiguantar.ues.utils.Ubicacion;
+import java.io.IOException;
 // Clase para manejar la interaccion con el usuario a triaves de consola
 
 public class ConsoleUI {
@@ -50,11 +51,13 @@ public class ConsoleUI {
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
             }
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
             // Si falla la limpieza, simplemente imprimimos líneas en blanco
-            for (int i = 0; i < 50; i++) {
-                System.out.println();
-            }
+            // for (int i = 0; i < 50; i++) {
+            //     System.out.println();
+            // }
+            //Si falla (ej: no es un entorno de consola real), simplemente ignorar o imprimir un mensaje
+            System.out.println("No se pudo limpiar la consola.");
         }
     }
 
@@ -82,15 +85,14 @@ public class ConsoleUI {
      */
 
     public int leerOpcion() {
-        int opcion = -1;
-        System.out.print(YELLOW + "Por favor, ingrese el número de la opción deseada: " + RESET);
-        try {
-            String input = scanner.nextLine();
-            opcion = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
-        }
-        return opcion;
+        // Se utiliza el método auxiliar para leer y validar la opción.
+        // El predicado `(opcion) -> true` significa que cualquier entero es aceptado por ahora,
+        // la validación específica del rango de opciones se hace en el bucle principal de la aplicación.
+        return leerEnteroValidado(
+                YELLOW + "Por favor, ingrese el número de la opción deseada: " + RESET, 
+                "Opción no válida.", 
+                (opcion) -> true 
+            ); 
     }
 
     public void cerrarScanner() {
@@ -116,34 +118,29 @@ public class ConsoleUI {
             System.out.println((i + 1) + ". " + TiposEmergenciaDisponibles.get(i).getNombre());
         }
 
-        TipoEmergencia tipoSeleccionado = null;
-        while (tipoSeleccionado == null) {
-            System.out.print(YELLOW + "\nIngrese el número del tipo: " + RESET);
-            try {
-                String input = scanner.nextLine();
-                int opcion = Integer.parseInt(input);
-                if (opcion > 0 && opcion <= TiposEmergenciaDisponibles.size()) {
-                    tipoSeleccionado = TiposEmergenciaDisponibles.get(opcion - 1);
-                } else {
-                    System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
-                }
-            } catch (NumberFormatException e) {
-                System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
-            }
-        }
-        return tipoSeleccionado;
+        // Usamos el método auxiliar para leer la opción, validando que esté en el rango correcto.
+        int opcionSeleccionada = leerEnteroValidado(
+            YELLOW + "\nIngrese el número del tipo: " + RESET,
+            "Opción no válida. Intente nuevamente.",
+            (opcion) -> opcion > 0 && opcion <= TiposEmergenciaDisponibles.size()
+        );
+
+        return TiposEmergenciaDisponibles.get(opcionSeleccionada - 1);
     }
+
+    /**
+     * Lee una coordenada (entero) desde la consola usando el método auxiliar.
+     *
+     * @param mensaje El mensaje a mostrar para solicitar la coordenada (ej. "X: ")
+     * @return La coordenada ingresada.
+     */
     private int leerCoordenada(String mensaje) {
-        int coordenada = Integer.MIN_VALUE;
-        while (coordenada == Integer.MIN_VALUE) {
-            System.out.print(mensaje);
-            try {   
-                coordenada = Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println(RED + "Entrada no válida. Por favor, ingrese un número entero." + RESET);
-            }
-        }
-        return coordenada;
+        // Utiliza leerEnteroValidado aceptando cualquier entero.
+        return leerEnteroValidado(
+                mensaje, 
+                "Entrada no válida.", 
+                (coord) -> true
+            );
     }
 
     /**
@@ -153,8 +150,8 @@ public class ConsoleUI {
     public Ubicacion solicitarUbicacion() {
         System.out.println("Ingrese la ubicacion de la emergencia (coordenadas X  Y): ");
         //llama a los metodos auxiliares para solicitar las coordenadas
-        int x = leerCoordenada("X");
-        int y = leerCoordenada("Y");
+        int x = leerCoordenada("X: ");
+        int y = leerCoordenada("Y: ");
         return new Ubicacion(x, y);
     }
 
@@ -176,22 +173,43 @@ public class ConsoleUI {
             System.out.println((i + 1) + ". " + gravedades[i]);
         }
 
-        NivelGravedad gravedadSeleccionada = null;
-        while (gravedadSeleccionada == null) {
-            System.out.print(YELLOW + "\nIngrese el número del nivel de gravedad: " + RESET);
+        // Usamos el método auxiliar para leer la opción, validando que esté en el rango correcto.
+        int opcionSeleccionada = leerEnteroValidado(
+            YELLOW + "\nIngrese el número del nivel de gravedad: " + RESET,
+            "Opción no válida. Intente nuevamente.",
+            (opcion) -> opcion > 0 && opcion <= gravedades.length
+        );
+
+        return gravedades[opcionSeleccionada - 1];
+    }
+
+    /**
+     * Lee un entero desde la consola, validando la entrada.
+     * Repite la solicitud hasta que se ingrese un entero válido que cumpla con el criterio de validación.
+     *
+     * @param mensajePrompt El mensaje a mostrar al usuario para solicitar la entrada.
+     * @param mensajeError El mensaje de error a mostrar si la entrada no es un número o no es válida.
+     * @param validador Una función lambda (Predicate) que define el criterio de validez del número ingresado.
+     * @return El número entero validado.
+     */
+    private int leerEnteroValidado(String mensajePrompt, String mensajeError, java.util.function.Predicate<Integer> validador) {
+        int valor = Integer.MIN_VALUE;
+        boolean valido = false;
+        while (!valido) {
+            System.out.print(mensajePrompt);
             try {
                 String input = scanner.nextLine();
-                int opcion = Integer.parseInt(input);
-                if (opcion > 0 && opcion <= gravedades.length) {
-                    gravedadSeleccionada = gravedades[opcion - 1];
+                valor = Integer.parseInt(input);
+                if (validador.test(valor)) {
+                    valido = true;
                 } else {
-                    System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
+                    System.out.println(RED + mensajeError + RESET);
                 }
             } catch (NumberFormatException e) {
-                System.out.println(RED + "Opción no válida. Intente nuevamente." + RESET);
+                System.out.println(RED + "Entrada no válida. Por favor, ingrese un número entero." + RESET);
             }
         }
-        return gravedadSeleccionada;
+        return valor;
     }
 
     public void mostrarEstadoRecursos(List<Recursos> disponibles, List<Recursos> ocupados) {
@@ -267,7 +285,7 @@ public class ConsoleUI {
     }
 
     public void mostrarMensajeExito(String mensaje) {
-        System.out.println(GREEN + "\n✓ " + mensaje + RESET);
+        System.out.println(GREEN   + mensaje + RESET);
         System.out.println("\nPresione ENTER para continuar...");
         scanner.nextLine();
     }

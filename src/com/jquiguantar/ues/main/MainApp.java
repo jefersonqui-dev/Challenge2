@@ -65,6 +65,9 @@ public class MainApp {
                     System.out.println(ConsoleUI.YELLOW + "\n--- Estadísticas del Día ---" + ConsoleUI.RESET);
                     sistema.resolverEmergenciasEnProgreso();
                     sistema.generarEstadisticas();
+                    
+                    System.out.println("\nPresione ENTER para continuar...");
+                    ui.scanner.nextLine();
                     break;
 
                 case 5: // Finalizar la jornada y salir

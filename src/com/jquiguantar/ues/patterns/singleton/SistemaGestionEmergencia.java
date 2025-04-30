@@ -220,7 +220,7 @@ public class SistemaGestionEmergencia {
             System.out.println(GREEN + 
             "Emergencia registrada con ID: " + emergencia.getId() + 
             " (" + emergencia.getTipo().getNombre() + 
-            "en " + emergencia.getUbicacion() + 
+            " en " + emergencia.getUbicacion() + 
             ", Gravedad: " + emergencia.getNivelGravedad() + ")" + RESET);
             //Aqui disparamos la notificacion a los observadores
             notificarObservadores(emergencia);
