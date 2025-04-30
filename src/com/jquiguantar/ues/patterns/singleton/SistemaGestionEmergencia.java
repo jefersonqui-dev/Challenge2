@@ -205,6 +205,10 @@ public class SistemaGestionEmergencia {
         recursosDisponibles.add(new com.jquiguantar.ues.model.resources.Patrulla("UP002", new Ubicacion(10, 90)));
         recursosDisponibles.add(new com.jquiguantar.ues.model.resources.Patrulla("UP003", new Ubicacion(10, 90)));
         recursosDisponibles.add(new com.jquiguantar.ues.model.resources.Patrulla("UP004", new Ubicacion(10, 90)));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.PoliciasPersonal("POLP001", new Ubicacion(12, 34)));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.ParamedicosPersonal("PARAP001", new Ubicacion(12, 34)));
+        recursosDisponibles.add(new com.jquiguantar.ues.model.resources.ParamedicosPersonal("PARAP002", new Ubicacion(12, 34)));
+// ... añade mas ...
         
         // System.out.println("Recursos Inicializados...");
     }
@@ -253,6 +257,57 @@ public class SistemaGestionEmergencia {
         }
     }
 
+    // Getter para la estrategia actual (necesario para la UI)
+    public EstrategiaPriorizacion getEstrategiaPriorizacionActual() {
+        return estrategiaPriorizacionActual;
+    }
+
+    /**
+     * Intenta atender la siguiente emergencia prioritaria según la estrategia actual.
+     * Obtiene la emergencia más prioritaria que esté PENDIENTE y llama a 
+     * asignarRecursosAEmergencia para ella.
+     * 
+     * @return true si se encontró y se intentó asignar recursos a una emergencia prioritaria,
+     *         false si no había emergencias pendientes o falló la asignación inicial.
+     */
+    public boolean atenderSiguienteEmergenciaPrioritaria() {
+        System.out.println(BOLD + YELLOW + "\n--- INTENTANDO ATENDER EMERGENCIA PRIORITARIA (Automático) ---" + RESET);
+        System.out.println(YELLOW + "Estrategia actual: " + (estrategiaPriorizacionActual != null ? estrategiaPriorizacionActual.getClass().getSimpleName() : "No definida") + RESET);
+
+        // 1. Filtrar emergencias PENDIENTES
+        List<Emergencia> pendientes = this.emergenciasActivas.stream()
+                                        .filter(e -> e.getEstado() == EstadoEmergencia.PENDIENTE)
+                                        .collect(Collectors.toList());
+
+        if (pendientes.isEmpty()) {
+            System.out.println(RED + "No hay emergencias PENDIENTES para atender." + RESET);
+            System.out.println(BOLD + YELLOW + "--- FIN ATENCIÓN AUTOMÁTICA ---" + RESET);
+            return false;
+        }
+
+        // 2. Priorizar las pendientes usando la estrategia actual
+        List<Emergencia> priorizadas = estrategiaPriorizacionActual.priorizar(pendientes);
+
+        if (priorizadas.isEmpty()) {
+            // Esto no debería ocurrir si 'pendientes' no estaba vacía, pero por seguridad
+            System.out.println(RED + "La estrategia no devolvió ninguna emergencia priorizada." + RESET);
+            System.out.println(BOLD + YELLOW + "--- FIN ATENCIÓN AUTOMÁTICA ---" + RESET);
+            return false;
+        }
+
+        // 3. Tomar la más prioritaria (la primera de la lista)
+        Emergencia emergenciaPrioritaria = priorizadas.get(0);
+        System.out.println(GREEN + "Emergencia más prioritaria seleccionada (ID: " + emergenciaPrioritaria.getId() + "): " +
+                           emergenciaPrioritaria.getTipo().getNombre() + " en " + emergenciaPrioritaria.getUbicacion() + 
+                           " (Gravedad: " + emergenciaPrioritaria.getNivelGravedad() + ")" + RESET);
+
+        // 4. Intentar asignar recursos a esta emergencia
+        boolean exitoAsignacion = asignarRecursosAEmergencia(emergenciaPrioritaria.getId());
+
+        System.out.println(BOLD + YELLOW + "--- FIN ATENCIÓN AUTOMÁTICA ---" + RESET);
+        return exitoAsignacion; // Devuelve si la asignación fue (al menos parcialmente) exitosa
+    }
+
     // METODO PARA ASIGNAR RECURSOS
     /**
      * Asigna recursos a una emergencia específica, priorizando por cercania.
@@ -289,18 +344,23 @@ public class SistemaGestionEmergencia {
         boolean asignacionExitosa = asignarRecursosPorTipo(emergencia, recursosNecesarios);
 
         // 4. Actualizar estado de la emergencia y finalizar
-        if (asignacionExitosa && emergencia.getRecursosAsignados().size() >= calcularTotalRecursosNecesarios(recursosNecesarios)) {
+        if (asignacionExitosa) {
             simularProcesamiento(TIEMPO_ASIGNACION, YELLOW + "  Actualizando estado de la emergencia" + RESET);
             emergencia.setEstado(EstadoEmergencia.EN_PROGRESO);
-            System.out.println(GREEN + "  Recursos asignados. Emergencia ID " + emergencia.getId() +
+            System.out.println(GREEN + "  Recursos asignados (total: " + emergencia.getRecursosAsignados().size() +"). Emergencia ID " + emergencia.getId() +
                     " ahora está " + emergencia.getEstado() + RESET);
+            // Opcional: Añadir advertencia si la asignación fue parcial
+            if (emergencia.getRecursosAsignados().size() < calcularTotalRecursosNecesarios(recursosNecesarios)) {
+                 System.out.println(YELLOW + "  Advertencia: La asignación de recursos fue parcial." + RESET);
+            }
         } else {
-            System.out.println(RED + "  Recursos insuficientes para atender completamente la emergencia ID " +
-                    emergencia.getId() + RESET);
+            // Si asignacionExitosa es false, significa que NINGÚN recurso de los tipos necesarios pudo ser asignado.
+            System.out.println(RED + "  Error Crítico: No se pudo asignar NINGÚN recurso esencial. La emergencia ID " +
+                    emergencia.getId() + " permanece en estado " + emergencia.getEstado() + RESET);
         }
         System.out.println(BOLD + BLUE + "--- Fin del Proceso de Asignación --- " + RESET);
 
-        return asignacionExitosa;
+        return asignacionExitosa; // Devolvemos si se pudo iniciar la asignación (al menos 1 recurso)
     }
     private int calcularTotalRecursosNecesarios(Map<TipoRecurso, Integer> recursosNecesarios) {
         return recursosNecesarios.values().stream()
@@ -354,10 +414,23 @@ public class SistemaGestionEmergencia {
 
             System.out.println(YELLOW + "\n  Tipo: " + tipoNecesario + " | Necesarios: " + cantidadNecesaria + RESET);
 
+
+                // *** Añadir DEBUG AQUI para ver que tipo se esta buscando ***
+                // System.out.println("DEBUG: Buscando recursos del tipo: " + tipoNecesario + " (Nombre exacto del Enum: " + tipoNecesario.name() + ")");
+
+
+
+
             // Obtener recursos disponibles del tipo requerido y ordenarlos por cercania
             simularProcesamiento(TIEMPO_BUSQUEDA, YELLOW + "    Buscando y Priorizando por cercania" + RESET);
             List<Recursos> recursosDisponiblesDelTipo = recursosDisponibles.stream()
-                    .filter(r -> r.getTipo() == tipoNecesario)
+                    .filter(r -> {
+                        boolean match = (r.getTipo() == tipoNecesario);
+                        
+                          //  System.out.println("DEBUG: Encontrado recurso del tipo: " + tipoNecesario + " (ID: " + r.getId() + ")");
+                        
+                        return match;
+                    })
                     //Ordenamos por cercania USANDO LAMBDAS
                     .sorted(Comparator.comparingInt(r -> MapaUrbano.CalcularDistanciaManhattan(r.getUbicacionActual(),emergencia.getUbicacion())))
                     .collect(Collectors.toList());
@@ -513,4 +586,21 @@ public class SistemaGestionEmergencia {
         System.out.println(YELLOW + "Recursos Ocupados: " + recursosOcupados.size() + RESET);
         System.out.println(BOLD + BLUE + "--------------------------------------" + RESET);
     }
+
+    // --- Getters para Estadísticas (necesarios para UI) ---
+
+    public int getTotalEmergenciasAtendidas() {
+        return totalEmergenciasAtendidas;
+    }
+
+    public Map<TipoEmergencia, Integer> getEmergenciasAtendidasPorTipo() {
+        // Devolvemos una copia para evitar modificaciones externas
+        return new HashMap<>(emergenciasAtendidasPorTipo);
+    }
+
+    public Map<TipoEmergencia, Long> getTiempoTotalRespuestaPorTipoMilis() {
+        // Devolvemos una copia para evitar modificaciones externas
+        return new HashMap<>(tiempoTotalRespuestaPorTipoMilis);
+    }
+
 }

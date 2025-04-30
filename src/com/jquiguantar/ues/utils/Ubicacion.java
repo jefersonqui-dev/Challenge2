@@ -38,4 +38,18 @@ public class Ubicacion {
         return result;  
     }
 
+    /**
+     * Calcula la distancia euclidiana entre esta ubicación y otra.
+     * @param otra La otra ubicación.
+     * @return La distancia calculada.
+     */
+    public double distanciaHasta(Ubicacion otra) {
+        if (otra == null) {
+            return Double.MAX_VALUE; // O lanzar excepción, según prefieras
+        }
+        double deltaX = this.x - otra.getX();
+        double deltaY = this.y - otra.getY();
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+
 }
