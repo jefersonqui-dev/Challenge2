@@ -39,4 +39,13 @@ public class Emergencia {
         return atendida;
     }
 
+    @Override
+    public String toString() {
+        return "Emergencia [tipo=" + tipo +
+                ", nivelGravedad=" + nivelGravedad +
+                ", ubicacion=" + ubicacion +
+                ", tiempoEstimado=" + tiempoEstimado +
+                ", atendida=" + atendida + "]";
+    }
+
 }
