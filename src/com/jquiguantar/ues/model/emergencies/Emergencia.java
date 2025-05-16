@@ -15,7 +15,7 @@ public class Emergencia {
         this.nivelGravedad = nivelGravedad;
         this.ubicacion = ubicacion;
         this.tiempoEstimado = tiempoEstimado;
-        this.atendida = atendida;
+        // this.atendida = atendida;
 
     }
 
