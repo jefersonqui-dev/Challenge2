@@ -2,15 +2,15 @@ package com.jquiguantar.ues.model.emergencies;
 
 import com.jquiguantar.ues.model.util.Ubicacion;
 
-public class Emergencia {
+public class Emergency {
 
-    private TipoEmergencia tipo;
-    private NivelGravedad nivelGravedad;
+    private EmergencyType tipo;
+    private SeverityLevel nivelGravedad;
     private Ubicacion ubicacion;
     private long tiempoEstimado;
     private boolean atendida;
 
-    public Emergencia(TipoEmergencia tipo, NivelGravedad nivelGravedad, Ubicacion ubicacion, long tiempoEstimado) {
+    public Emergency(EmergencyType tipo, SeverityLevel nivelGravedad, Ubicacion ubicacion, long tiempoEstimado) {
         this.tipo = tipo;
         this.nivelGravedad = nivelGravedad;
         this.ubicacion = ubicacion;
@@ -19,11 +19,11 @@ public class Emergencia {
 
     }
 
-    public TipoEmergencia getTipo() {
+    public EmergencyType getTipo() {
         return tipo;
     }
 
-    public NivelGravedad getNivelGravedad() {
+    public SeverityLevel getNivelGravedad() {
         return nivelGravedad;
     }
 

@@ -1,5 +1,5 @@
 package com.jquiguantar.ues.model.emergencies;
 
-public enum NivelGravedad {
+public enum SeverityLevel {
     BAJO, MEDIO, ALTO
 }
