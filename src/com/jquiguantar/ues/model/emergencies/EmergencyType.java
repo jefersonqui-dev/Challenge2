@@ -1,5 +1,5 @@
 package com.jquiguantar.ues.model.emergencies;
 
-public enum TipoEmergencia {
+public enum EmergencyType {
     INCENDIO, ACCIDENTE_VEHICULAR, ROBO
 }
